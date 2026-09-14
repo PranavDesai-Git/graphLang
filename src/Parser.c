@@ -3,6 +3,7 @@
 #include "Lexer.h"
 #include "TreeNode.h"
 #include "Evaluator.h"
+#include "GarbageCollector.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -87,6 +88,7 @@ static Node *parseExpression(CompilerScope *scope) {
             CompilerScope funcScope = {.parent = scope, .localCount = 0};
 
             Node *paramsList = createList(0, NULL);
+            pushRoot(paramsList);
             Node *currParam = paramsList;
 
             while (currentToken.type != TOKEN_RPAREN) {
@@ -114,12 +116,15 @@ static Node *parseExpression(CompilerScope *scope) {
             funcName[nameToken.length] = '\0';
 
             defineFunction(funcName, paramsList, body);
+            popRoot();
             return NULL;
         }
 
         Node *funcNode = parseExpression(scope);
+        pushRoot(funcNode);
 
         Node *argsList = createList(0, NULL);
+        pushRoot(argsList);
         Node *currArg = argsList;
 
         while (currentToken.type != TOKEN_RPAREN) {
@@ -132,7 +137,10 @@ static Node *parseExpression(CompilerScope *scope) {
         }
         consume(TOKEN_RPAREN, "Expected ')' at end of function call");
 
-        return createFunction(funcNode, argsList);
+        Node *result = createFunction(funcNode, argsList);
+        popRoot();
+        popRoot();
+        return result;
     }
 
     printf("Parse Error: Unexpected token!\n");
@@ -146,8 +154,12 @@ void parse(const char *source) {
         Node *expr = parseExpression(NULL);
         if (expr != NULL) {
             printf("Evaluating expression...\n");
-            // Evaluate and print result! (Assuming it's a number for now)
+            
+            // PROTECT THE PARSED AST FROM THE GC!
+            pushRoot(expr);
             Node *result = evaluate(expr, NULL);
+            popRoot();
+
             if (getNodeType(result) == LITERAL) {
                 printf("Result: %d\n", getLiteral(result));
             }
