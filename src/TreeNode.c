@@ -1,9 +1,8 @@
 #include "Allocator.h"
 #include "GarbageCollector.h"
 #include "TreeNodePrivate.h"
-#include "TreeNodePrivate.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 Node *createLiteral(int value) {
     Node *n = allocNode();
@@ -109,6 +108,22 @@ Node *createArgs3(Node *arg1, Node *arg2, Node *arg3) {
     l1->left = arg1;
     return l1;
 }
+
+Node *createUserData(int typeID, int subType, Node *left, Node *right,
+                     void *rawData) {
+    Node *n = allocNode();
+    n->type = USER_DATA;
+    n->infoFlags = typeID;
+    n->errorFlags = subType;
+    n->data.userdata = rawData;
+    n->left = left;
+    n->right = right;
+    return n;
+}
+
+void *getUserData(Node *n) { return n->data.userdata; }
+int getTypeID(Node *n) { return n->infoFlags; }
+int getSubType(Node *n) { return n->errorFlags; }
 
 NodeType getNodeType(Node *n) { return n->type; }
 Node *getLeft(Node *n) { return n->left; }

@@ -12,6 +12,7 @@ struct Node {
         char *func;
         int listLiteral;
         struct Node **locals;
+        void *userdata;
     } data;
 
     NodeType type;

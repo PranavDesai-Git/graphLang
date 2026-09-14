@@ -1,7 +1,15 @@
 #ifndef TREENODE_H
 #define TREENODE_H
 
-typedef enum { LITERAL, GLOBAL_VAR, LOCAL_VAR, FUNCTION, LIST, ENV_FRAME } NodeType;
+typedef enum {
+    LITERAL,
+    GLOBAL_VAR,
+    LOCAL_VAR,
+    FUNCTION,
+    LIST,
+    ENV_FRAME,
+    USER_DATA
+} NodeType;
 
 typedef struct Node Node;
 
@@ -44,9 +52,14 @@ Node *createLocalVar(int depth, int index);
 Node *createFunction(Node *funcExpr, Node *args);
 Node *createList(int value, Node *nextNode);
 Node *createEnvFrame(int size, Node *parentScope);
-Node *copyTree(Node *root);
-Node *substitute(Node *root, char *paramName, Node *argValue);
 Node *createArgs1(Node *arg1);
 Node *createArgs2(Node *arg1, Node *arg2);
 Node *createArgs3(Node *arg1, Node *arg2, Node *arg3);
+
+Node *createUserData(int typeID, int subType, Node *left, Node *right,
+                     void *rawData);
+void *getUserData(Node *n);
+int getTypeID(Node *n);
+int getSubType(Node *n);
+
 #endif // TREENODE_H

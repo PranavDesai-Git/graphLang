@@ -24,6 +24,12 @@ typedef struct {
     int (*getLiteral)(Handle n);
     char *(*getVarName)(Handle n);
     char *(*getFuncName)(Handle n);
+
+    Handle (*createUserData)(int typeID, int subType, Handle left, Handle right,
+                             void *rawData);
+    void *(*getUserData)(Handle n);
+    int (*getTypeID)(Handle n);
+    int (*getSubType)(Handle n);
 } VMAPI;
 
 #endif

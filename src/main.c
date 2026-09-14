@@ -5,12 +5,12 @@
 #include "PluginAPIHandle.h"
 #include <dlfcn.h>
 #include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <setjmp.h>
-#include <readline/readline.h>
 #include <readline/history.h>
+#include <readline/readline.h>
+#include <setjmp.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 jmp_buf error_jmp;
 
@@ -68,13 +68,14 @@ int main(void) {
             char promptBuf[256];
             strcpy(promptBuf, "\001\033[1;33m\002  > \001\033[0m\002");
             for (int i = 0; i < openParens; i++) {
-                strcat(promptBuf, "    "); // Readline handles spaces better than tabs
+                strcat(promptBuf,
+                       "    "); // Readline handles spaces better than tabs
             }
             input = readline(promptBuf);
         }
 
         if (!input) {
-            break; 
+            break;
         }
 
         // Empty line
@@ -96,12 +97,16 @@ int main(void) {
         isMultiline = 1;
 
         for (int i = 0; input[i] != '\0'; i++) {
-            if (input[i] == ';') break; 
-            if (input[i] == '(') openParens++;
-            if (input[i] == ')') openParens--;
+            if (input[i] == ';')
+                break;
+            if (input[i] == '(')
+                openParens++;
+            if (input[i] == ')')
+                openParens--;
         }
 
-        if (openParens < 0) openParens = 0;
+        if (openParens < 0)
+            openParens = 0;
 
         strncat(buffer, input, sizeof(buffer) - strlen(buffer) - 2);
         strcat(buffer, "\n"); // Add the newline back
