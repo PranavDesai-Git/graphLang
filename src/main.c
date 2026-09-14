@@ -1,4 +1,5 @@
 #include "Allocator.h"
+#include "GarbageCollector.h"
 #include "Parser.h"
 #include "PluginAPI.h"
 #include "PluginAPIHandle.h"
@@ -44,6 +45,7 @@ int main(void) {
     printf("Starting GraphLang VM...\n");
 
     initAllocator();
+    enableGC();
 
     printf("\n\033[1;36m==============================\033[0m\n");
     printf("\033[1;32m   GraphLang Interactive REPL   \033[0m\n");
