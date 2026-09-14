@@ -125,17 +125,17 @@ void *getUserData(Node *n) { return n->data.userdata; }
 int getTypeID(Node *n) { return n->infoFlags; }
 int getSubType(Node *n) { return n->errorFlags; }
 
-NodeType getNodeType(Node *n) { return n->type; }
-Node *getLeft(Node *n) { return n->left; }
-Node *getRight(Node *n) { return n->right; }
-int getLiteral(Node *n) { return n->data.literal; }
-char *getVarName(Node *n) { return n->data.var; }
-char *getFuncName(Node *n) { return n->data.func; }
+NodeType getNodeType(Node *n) { return n ? n->type : (NodeType)-1; }
+Node *getLeft(Node *n) { return n ? n->left : NULL; }
+Node *getRight(Node *n) { return n ? n->right : NULL; }
+int getLiteral(Node *n) { return n ? n->data.literal : 0; }
+char *getVarName(Node *n) { return n ? n->data.var : NULL; }
+char *getFuncName(Node *n) { return n ? n->data.func : NULL; }
 
-int getVarIndex(Node *n) { return n->data.index; }
-int getVarDepth(Node *n) { return n->infoFlags; }
-Node **getLocalsArray(Node *n) { return n->data.locals; }
-int getLocalsCount(Node *n) { return n->errorFlags; }
+int getVarIndex(Node *n) { return n ? n->data.index : 0; }
+int getVarDepth(Node *n) { return n ? n->infoFlags : 0; }
+Node **getLocalsArray(Node *n) { return n ? n->data.locals : NULL; }
+int getLocalsCount(Node *n) { return n ? n->errorFlags : 0; }
 
-void setLeft(Node *n, Node *left) { n->left = left; }
-void setRight(Node *n, Node *right) { n->right = right; }
+void setLeft(Node *n, Node *left) { if (n) n->left = left; }
+void setRight(Node *n, Node *right) { if (n) n->right = right; }

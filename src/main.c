@@ -17,6 +17,7 @@
 #define IO_RETURN 0
 #define IO_PRINT 1
 #define IO_BIND 2
+#define IO_SEQ 3
 
 jmp_buf error_jmp;
 
@@ -48,6 +49,12 @@ Node *executeIO(Node *action) {
             pushRoot(call);
             action = evaluate(call, NULL); // evaluate returns the next IO action!
             popRoot();
+        } else if (subType == IO_SEQ) {
+            Node *firstAction = getLeft(action);
+            Node *secondAction = getRight(action);
+
+            executeIO(firstAction);
+            action = secondAction; // tail recurse into the second action
         } else {
             break;
         }

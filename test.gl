@@ -1,4 +1,0 @@
-(define mycb (x) (io.print 200))
-(define main () (io.bind (io.print 100) mycb))
-(main)
-

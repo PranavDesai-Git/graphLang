@@ -71,23 +71,39 @@ static NodeType api_getNodeType(Handle n) {
 }
 
 static Handle api_getLeft(Handle n) {
-    return makeHandle(getLeft(resolveHandle(n)));
+    Node *node = resolveHandle(n);
+    if (node == NULL) return -1;
+    return makeHandle(getLeft(node));
 }
 
 static Handle api_getRight(Handle n) {
-    return makeHandle(getRight(resolveHandle(n)));
+    Node *node = resolveHandle(n);
+    if (node == NULL) return -1;
+    return makeHandle(getRight(node));
 }
 
-static int api_getLiteral(Handle n) { return getLiteral(resolveHandle(n)); }
+static int api_getLiteral(Handle n) { 
+    Node *node = resolveHandle(n);
+    if (node == NULL) return 0;
+    return getLiteral(node); 
+}
 
-static char *api_getVarName(Handle n) { return getVarName(resolveHandle(n)); }
+static char *api_getVarName(Handle n) { 
+    Node *node = resolveHandle(n);
+    if (node == NULL) return NULL;
+    return getVarName(node); 
+}
 
-static char *api_getFuncName(Handle n) { return getFuncName(resolveHandle(n)); }
+static char *api_getFuncName(Handle n) { 
+    Node *node = resolveHandle(n);
+    if (node == NULL) return NULL;
+    return getFuncName(node); 
+}
 
 static Handle api_createUserData(int typeID, int subType, Handle leftH,
                                  Handle rightH, void *rawData) {
-    Node *left = (leftH != 0) ? gcRoots[leftH] : NULL;
-    Node *right = (rightH != 0) ? gcRoots[rightH] : NULL;
+    Node *left = (leftH >= 0 && leftH < rootCount) ? gcRoots[leftH] : NULL;
+    Node *right = (rightH >= 0 && rightH < rootCount) ? gcRoots[rightH] : NULL;
     Node *res = createUserData(typeID, subType, left, right, rawData);
     pushRoot(res);
     return rootCount - 1;

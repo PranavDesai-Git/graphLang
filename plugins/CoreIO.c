@@ -5,6 +5,7 @@
 #define IO_RETURN 0
 #define IO_PRINT 1
 #define IO_BIND 2
+#define IO_SEQ 3
 
 static VMAPI vm;
 
@@ -31,9 +32,20 @@ Handle nativeIOBind(Handle args, Handle env) {
     return vm.createUserData(TYPE_IO, IO_BIND, evalAction, evalCallback, NULL);
 }
 
+Handle nativeIOSeq(Handle args, Handle env) {
+    Handle action1 = vm.getLeft(args);
+    Handle action2 = vm.getLeft(vm.getRight(args));
+    
+    Handle evalAction1 = vm.evaluate(action1, env);
+    Handle evalAction2 = vm.evaluate(action2, env);
+    
+    return vm.createUserData(TYPE_IO, IO_SEQ, evalAction1, evalAction2, NULL);
+}
+
 void initPlugin(VMAPI providedApi) {
     vm = providedApi;
     vm.registerNative("io.return", nativeIOReturn);
     vm.registerNative("io.print", nativeIOPrint);
     vm.registerNative("io.bind", nativeIOBind);
+    vm.registerNative("io.seq", nativeIOSeq);
 }

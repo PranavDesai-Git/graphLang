@@ -1,0 +1,19 @@
+(define sum (n)
+    (? (< n 2)
+        n
+        (+ n (sum (- n 1)))
+        )
+    )
+
+(define rep (x)
+    (? (< x 1)
+        (io.return 0)
+        (io.seq 
+            (io.print (sum x)) 
+            (rep (- x 1))
+        )
+    )
+)
+
+(rep 30)
+
