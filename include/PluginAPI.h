@@ -15,6 +15,13 @@ typedef struct {
     Node *(*copyTree)(Node *root);
     void (*pushRoot)(Node *node);
     void (*popRoot)(void);
+
+    NodeType (*getNodeType)(Node *n);
+    Node *(*getLeft)(Node *n);
+    Node *(*getRight)(Node *n);
+    int (*getLiteral)(Node *n);
+    char *(*getVarName)(Node *n);
+    char *(*getFuncName)(Node *n);
 } VMAPI;
 
 #endif

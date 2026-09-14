@@ -6,7 +6,6 @@
 #include "TreeNode.h"
 #include <dlfcn.h>
 #include <stdio.h>
-#include <string.h>
 #include <time.h>
 
 void loadPlugin(const char *path, VMAPI api) {
@@ -41,7 +40,13 @@ int main(void) {
                  .pushRoot = pushRoot,
                  .popRoot = popRoot,
                  .createList = createList,
-                 .copyTree = copyTree};
+                 .copyTree = copyTree,
+                 .getNodeType = getNodeType,
+                 .getLeft = getLeft,
+                 .getRight = getRight,
+                 .getLiteral = getLiteral,
+                 .getVarName = getVarName,
+                 .getFuncName = getFuncName};
     // hardcoded for now
     loadPlugin("./out/CoreMath.so", api);
 
@@ -77,17 +82,17 @@ int main(void) {
                                    createArgs3(cond, trueBranch, falseBranch));
 
     Node *paramsList = createList(0, NULL);
-    paramsList->left = createVariable("n");
+    setLeft(paramsList, createVariable("n"));
     defineFunction("fib", paramsList, fibBody);
 
     // fib(25)
     Node *mainCall =
-        createFunction(createVariable("fib"), createArgs1(createLiteral(40)));
+        createFunction(createVariable("fib"), createArgs1(createLiteral(25)));
 
     defineVariable("main", mainCall);
 
     printf("Building AST for fib(n)...\n");
-    printf("Evaluating fib(40)... \n\n");
+    printf("Evaluating fib(25)... \n\n");
     enableGC();
 
     clock_t start = clock();
@@ -95,7 +100,7 @@ int main(void) {
     clock_t end = clock();
 
     double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("\n=== RESULT: %d ===\n", result->data.literal);
+    printf("\n=== RESULT: %d ===\n", getLiteral(result));
     printf("=== TIME: %f seconds ===\n\n", time_spent);
 
     printf("Running Final GC Pass...\n");

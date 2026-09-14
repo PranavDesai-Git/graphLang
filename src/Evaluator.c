@@ -9,13 +9,13 @@ Node *evaluate(Node *node, LocalEnv *env) {
     if (node == NULL)
         return NULL;
 
-    switch (node->type) {
+    switch (getNodeType(node)) {
     case LITERAL:
         return node;
 
     case VARIABLE: {
         LocalEnv *temp = env;
-        char *varName = node->data.var;
+        char *varName = getVarName(node);
         while (temp != NULL) {
             if (strcmp(temp->varName, varName) == 0) {
                 Node *evaluatedArg = evaluate(temp->value, env);
@@ -26,7 +26,7 @@ Node *evaluate(Node *node, LocalEnv *env) {
         }
         EnvEntry *var = getEnvEntry(varName);
         if (var == NULL) {
-            printf("Runtime Error: Undefined variable '%s'\n", node->data.var);
+            printf("Runtime Error: Undefined variable '%s'\n", getVarName(node));
             exit(1);
         }
         if (var->isFunc == 1 || var->isFunc == 2) {
@@ -37,16 +37,16 @@ Node *evaluate(Node *node, LocalEnv *env) {
     }
 
     case FUNCTION: { // This is an APPLICATION node
-        Node *funcNode = evaluate(node->left, env); // Get the function to run
-        if (funcNode->type != VARIABLE) {
+        Node *funcNode = evaluate(getLeft(node), env); // Get the function to run
+        if (getNodeType(funcNode) != VARIABLE) {
             printf("Runtime Error: Not a function!\n");
             exit(1);
         }
 
-        EnvEntry *func = getEnvEntry(funcNode->data.var);
+        EnvEntry *func = getEnvEntry(getVarName(funcNode));
         if (func == NULL) {
             printf("Runtime Error: Undefined function '%s'\n",
-                   funcNode->data.var);
+                   getVarName(funcNode));
             exit(1);
         }
 
@@ -54,12 +54,12 @@ Node *evaluate(Node *node, LocalEnv *env) {
 
         if (func->isFunc == 1) { // Native C Function
             Func eval = func->val.func;
-            result = eval(node->right, env); // Args are in right
+            result = eval(getRight(node), env); // Args are in right
 
         } else if (func->isFunc == 2) { // User-Defined Function
             LocalEnv newEnv;
-            newEnv.varName = func->params->left->data.var;
-            newEnv.value = evaluate(node->right->left, env);
+            newEnv.varName = getVarName(getLeft(func->params));
+            newEnv.value = evaluate(getLeft(getRight(node)), env);
             pushRoot(newEnv.value); // PROTECT FROM GC!
             newEnv.next = env;
             result = evaluate(func->val.node, &newEnv);
