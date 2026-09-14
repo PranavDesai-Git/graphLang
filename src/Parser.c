@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
+extern jmp_buf error_jmp;
 
 static Token currentToken;
 
@@ -20,7 +22,7 @@ static void advance(void) {
     if (currentToken.type == TOKEN_ERROR) {
         printf("Syntax err on line %d: %.*s \n", currentToken.line,
                currentToken.length, currentToken.start);
-        exit(1);
+        longjmp(error_jmp, 1);
     }
 }
 
@@ -31,7 +33,7 @@ static void consume(TokenType type, const char *errorMessage) {
     }
 
     printf("Parse Error on line %d: %s\n", currentToken.line, errorMessage);
-    exit(1);
+    longjmp(error_jmp, 1);
 }
 
 static Node *resolveVariable(CompilerScope *scope, Token name) {
@@ -134,7 +136,7 @@ static Node *parseExpression(CompilerScope *scope) {
     }
 
     printf("Parse Error: Unexpected token!\n");
-    exit(1);
+    longjmp(error_jmp, 1);
 }
 
 void parse(const char *source) {

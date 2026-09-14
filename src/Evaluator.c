@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <setjmp.h>
+extern jmp_buf error_jmp;
 #include "PluginAPI.h"
 
 Node *evaluate(Node *node, Node *env) {
@@ -28,7 +30,7 @@ Node *evaluate(Node *node, Node *env) {
         EnvEntry *var = getEnvEntry(getVarName(node));
         if (var == NULL) {
             printf("Runtime Error: Undefined variable '%s'\n", getVarName(node));
-            exit(1);
+            longjmp(error_jmp, 1);
         }
         if (var->isFunc == 1 || var->isFunc == 2) {
             return node; // Return the function identifier node as-is!
@@ -40,14 +42,14 @@ Node *evaluate(Node *node, Node *env) {
         Node *funcNode = evaluate(getLeft(node), env); // Get the function to run
         if (getNodeType(funcNode) != GLOBAL_VAR) {
             printf("Runtime Error: Not a function!\n");
-            exit(1);
+            longjmp(error_jmp, 1);
         }
 
         EnvEntry *func = getEnvEntry(getVarName(funcNode));
         if (func == NULL) {
             printf("Runtime Error: Undefined function '%s'\n",
                    getVarName(funcNode));
-            exit(1);
+            longjmp(error_jmp, 1);
         }
 
         Node *result;
@@ -90,7 +92,7 @@ Node *evaluate(Node *node, Node *env) {
             popRoot(); // UNPROTECT env
         } else {
             printf("Runtime Error: '%s' is not a function!\n", func->key);
-            exit(1);
+            longjmp(error_jmp, 1);
         }
 
         return result;
