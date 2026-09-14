@@ -3,6 +3,7 @@
 #include "Parser.h"
 #include "PluginAPI.h"
 #include "PluginAPIHandle.h"
+#include "Evaluator.h"
 #include <dlfcn.h>
 #include <stdio.h>
 #include <readline/history.h>
@@ -12,7 +13,47 @@
 #include <string.h>
 #include <time.h>
 
+#define TYPE_IO 100
+#define IO_RETURN 0
+#define IO_PRINT 1
+#define IO_BIND 2
+
 jmp_buf error_jmp;
+
+Node *executeIO(Node *action) {
+    while (action != NULL && getNodeType(action) == USER_DATA && getTypeID(action) == TYPE_IO) {
+        int subType = getSubType(action);
+        
+        if (subType == IO_RETURN) {
+            return getLeft(action);
+        } else if (subType == IO_PRINT) {
+            Node *val = getLeft(action);
+            if (getNodeType(val) == LITERAL) {
+                printf("%d\n", getLiteral(val));
+            } else {
+                printf("<non-literal output>\n");
+            }
+            return NULL; // unit
+        } else if (subType == IO_BIND) {
+            Node *firstAction = getLeft(action);
+            Node *callback = getRight(action);
+
+            Node *res1 = executeIO(firstAction);
+            
+            // Apply callback to res1
+            Node *args = createList(0, NULL);
+            setLeft(args, res1);
+            Node *call = createFunction(callback, args);
+            
+            pushRoot(call);
+            action = evaluate(call, NULL); // evaluate returns the next IO action!
+            popRoot();
+        } else {
+            break;
+        }
+    }
+    return action;
+}
 
 void loadPlugin(const char *path, VMAPI api) {
     void *handle = dlopen(path, RTLD_LAZY);
@@ -41,6 +82,7 @@ int main(void) {
 
     // hardcoded for now
     loadPlugin("./out/CoreMath.so", api);
+    loadPlugin("./out/CoreIO.so", api);
 
     printf("Starting GraphLang VM...\n");
 

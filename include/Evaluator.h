@@ -5,6 +5,7 @@
 #include "Environment.h"
 
 Node *evaluate(Node *node, Node *env);
+Node *executeIO(Node *action);
 Node *copyTree(Node *root);
 Node *substitute(Node *root, char *paramName, Node *argValue);
 

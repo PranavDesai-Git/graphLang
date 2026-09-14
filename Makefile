@@ -6,20 +6,22 @@ CFLAGS = -Wall -Wextra -Wpedantic -std=c11 -Iinclude -g
 SRCDIR = src
 OBJDIR = out
 INCDIR = include
+PLUGINDIR = plugins
 
 # Files
 SRCS = $(wildcard $(SRCDIR)/*.c)
-OBJS = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SRCS))
+OBJS = $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SRCS))
 TARGET = $(OBJDIR)/graphLang
-PLUGIN = $(OBJDIR)/CoreMath.so
 
-.PHONY: all clean run plugin
+# Plugins
+PLUGIN_SRCS = $(wildcard $(PLUGINDIR)/*.c)
+PLUGIN_OBJS = $(patsubst $(PLUGINDIR)/%.c, $(OBJDIR)/%.so, $(PLUGIN_SRCS))
 
-all: $(TARGET) plugin
+.PHONY: all clean run
 
-plugin: $(PLUGIN)
+all: $(TARGET) $(PLUGIN_OBJS)
 
-$(PLUGIN): plugins/CoreMath.c | $(OBJDIR)
+$(OBJDIR)/%.so: $(PLUGINDIR)/%.c | $(OBJDIR)
 	$(CC) -shared -fPIC -Iinclude $< -o $@
 
 $(TARGET): $(OBJS)
@@ -36,7 +38,3 @@ clean:
 
 run: all
 	./$(TARGET)
-
-compiledb: clean
-	bear -- make all
-

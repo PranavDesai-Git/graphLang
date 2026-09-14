@@ -74,7 +74,7 @@ static Token identifier(void) {
     while (isalnum(peek()) || peek() == '_' || peek() == '+' || peek() == '-' ||
            peek() == '*' || peek() == '/' || peek() == '<' || peek() == '>' ||
            peek() == '=' || peek() == '?' || peek() == '!' || peek() == '&' ||
-           peek() == '|') {
+           peek() == '|' || peek() == '.') {
         advance();
     }
     return makeToken(TOKEN_IDENTIFIER);

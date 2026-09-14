@@ -160,8 +160,15 @@ void parse(const char *source) {
             Node *result = evaluate(expr, NULL);
             popRoot();
 
-            if (getNodeType(result) == LITERAL) {
+            // Execute if it's an IO Action
+            if (result != NULL && getNodeType(result) == USER_DATA && getTypeID(result) == 100) {
+                result = executeIO(result);
+            }
+
+            if (result != NULL && getNodeType(result) == LITERAL) {
                 printf("Result: %d\n", getLiteral(result));
+            } else if (result != NULL) {
+                printf("DEBUG: Result NodeType = %d\n", getNodeType(result));
             }
         }
     }
