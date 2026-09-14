@@ -8,8 +8,10 @@ struct Node {
     union {
         int literal;
         char *var;
+        int index;
         char *func;
         int listLiteral;
+        struct Node **locals;
     } data;
 
     NodeType type;
