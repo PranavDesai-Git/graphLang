@@ -7,8 +7,9 @@ An experimental, blazing fast purely functional Graph Reduction Virtual Machine 
 - [ ] Implement Cheney's Copying GC (O(1) Allocation & Zero-pause Sweeps)
 - [ ] Add Tail Call Optimization (TCO) with a Trampoline
 - [ ] Implement Algebraic Rewriting (Tupling) for Automatic Tail Recursion Transformation
-- [ ] Support Custom Datatypes (Plugin-defined ADTs & Userdata)
-- [ ] Build IO Monads for Side Effects
+- [ ] Add Anonymous Functions (Lambdas / Closures)
+- [x] Support Custom Datatypes (Plugin-defined ADTs & Userdata)
+- [x] Build IO Monads for Side Effects
 - [x] Create a Frontend Lexer, Parser, and REPL
 
 GraphLang is a minimal, fast, integer-only programming language. At its core, it is an expression evaluator built entirely on a **strict binary tree**, with built-in support for variables, functions, and conditionals.
