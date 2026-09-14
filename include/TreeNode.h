@@ -3,23 +3,35 @@
 
 typedef enum { LITERAL, VARIABLE, FUNCTION, LIST } NodeType;
 
-typedef struct Node {
-    struct Node *left;
-    struct Node *right;
+typedef struct Node Node;
 
-    union {
-        int literal;
-        char *var;
-        char *func;
-        int listLiteral;
-    } data;
+/*
+struct Node *left;
+struct Node *right;
 
-    NodeType type;
+union {
+    int literal;
+    char *var;
+    char *func;
+    int listLiteral;
+} data;
 
-    unsigned int infoFlags;
-    unsigned int errorFlags;
-    unsigned int statusFlags;
-} Node;
+NodeType type;
+
+unsigned int infoFlags;
+unsigned int errorFlags;
+unsigned int statusFlags;
+*/
+
+NodeType getNodeType(Node *n);
+Node *getLeft(Node *n);
+Node *getRight(Node *n);
+int getLiteral(Node *n);
+char *getVarName(Node *n);
+char *getFuncName(Node *n);
+
+void setLeft(Node *n, Node *left);
+void setRight(Node *n, Node *right);
 
 Node *createLiteral(int value);
 Node *createVariable(char *varName);

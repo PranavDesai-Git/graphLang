@@ -1,6 +1,6 @@
-#include "TreeNode.h"
 #include "Allocator.h"
 #include "GarbageCollector.h"
+#include "TreeNodePrivate.h"
 #include <string.h>
 
 Node *createLiteral(int value) {
@@ -85,3 +85,13 @@ Node *createArgs3(Node *arg1, Node *arg2, Node *arg3) {
     l1->left = arg1;
     return l1;
 }
+
+NodeType getNodeType(Node *n) { return n->type; }
+Node *getLeft(Node *n) { return n->left; }
+Node *getRight(Node *n) { return n->right; }
+int getLiteral(Node *n) { return n->data.literal; }
+char *getVarName(Node *n) { return n->data.var; }
+char *getFuncName(Node *n) { return n->data.func; }
+
+void setLeft(Node *n, Node *left) { n->left = left; }
+void setRight(Node *n, Node *right) { n->right = right; }

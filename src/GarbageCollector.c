@@ -1,6 +1,6 @@
 #include "GarbageCollector.h"
 #include "Environment.h"
-#include "TreeNode.h"
+#include "TreeNodePrivate.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,7 +21,8 @@ void pushRoot(Node *node) {
 }
 
 void popRoot(void) {
-    if (rootCount > 0) rootCount--;
+    if (rootCount > 0)
+        rootCount--;
 }
 
 void markNode(Node *n) {

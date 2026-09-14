@@ -1,5 +1,5 @@
 #include "GarbageCollector.h"
-#include "TreeNode.h"
+#include "TreeNodePrivate.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -50,7 +50,7 @@ Node *popFreeList(void) {
 Node *allocNode(void) {
     Node *newNode;
     Node *recycled = popFreeList();
-    
+
     if (recycled == NULL && gcEnabled) {
         markAll();
         sweep();
