@@ -35,7 +35,8 @@ int main(void) {
     VMAPI api = {.registerNative = registerNative,
                  .evaluate = evaluate,
                  .createLiteral = createLiteral,
-                 .createVariable = createVariable,
+                 .createGlobalVar = createGlobalVar,
+                 .createLocalVar = createLocalVar,
                  .createFunction = createFunction,
                  .pushRoot = pushRoot,
                  .popRoot = popRoot,
@@ -56,38 +57,38 @@ int main(void) {
 
     // condition: n < 2
     Node *cond =
-        createFunction(createVariable("<"),
-                       createArgs2(createVariable("n"), createLiteral(2)));
+        createFunction(createGlobalVar("<"),
+                       createArgs2(createLocalVar(0, 0), createLiteral(2)));
 
     // true branch: n
-    Node *trueBranch = createVariable("n");
+    Node *trueBranch = createLocalVar(0, 0);
 
     // false branch: fib(n-1) + fib(n-2)
     Node *fib_n_minus_1 = createFunction(
-        createVariable("fib"),
+        createGlobalVar("fib"),
         createArgs1(createFunction(
-            createVariable("-"),
-            createArgs2(createVariable("n"), createLiteral(1)))));
+            createGlobalVar("-"),
+            createArgs2(createLocalVar(0, 0), createLiteral(1)))));
 
     Node *fib_n_minus_2 = createFunction(
-        createVariable("fib"),
+        createGlobalVar("fib"),
         createArgs1(createFunction(
-            createVariable("-"),
-            createArgs2(createVariable("n"), createLiteral(2)))));
+            createGlobalVar("-"),
+            createArgs2(createLocalVar(0, 0), createLiteral(2)))));
 
     Node *falseBranch = createFunction(
-        createVariable("+"), createArgs2(fib_n_minus_1, fib_n_minus_2));
+        createGlobalVar("+"), createArgs2(fib_n_minus_1, fib_n_minus_2));
 
-    Node *fibBody = createFunction(createVariable("?"),
+    Node *fibBody = createFunction(createGlobalVar("?"),
                                    createArgs3(cond, trueBranch, falseBranch));
 
     Node *paramsList = createList(0, NULL);
-    setLeft(paramsList, createVariable("n"));
+    setLeft(paramsList, createGlobalVar("n")); // Parameter name is still a string (global var type temporarily handles this)
     defineFunction("fib", paramsList, fibBody);
 
     // fib(25)
     Node *mainCall =
-        createFunction(createVariable("fib"), createArgs1(createLiteral(25)));
+        createFunction(createGlobalVar("fib"), createArgs1(createLiteral(25)));
 
     defineVariable("main", mainCall);
 

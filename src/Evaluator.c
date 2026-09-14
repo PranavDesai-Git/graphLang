@@ -1,11 +1,11 @@
 #include "Environment.h"
-#include "TreeNode.h"
 #include "GarbageCollector.h"
+#include "TreeNode.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-Node *evaluate(Node *node, LocalEnv *env) {
+Node *evaluate(Node *node, Node *env) {
     if (node == NULL)
         return NULL;
 
@@ -13,18 +13,18 @@ Node *evaluate(Node *node, LocalEnv *env) {
     case LITERAL:
         return node;
 
-    case VARIABLE: {
-        LocalEnv *temp = env;
-        char *varName = getVarName(node);
-        while (temp != NULL) {
-            if (strcmp(temp->varName, varName) == 0) {
-                Node *evaluatedArg = evaluate(temp->value, env);
-                temp->value = evaluatedArg; // Memoize in the environment!
-                return evaluatedArg;
-            }
-            temp = temp->next;
+    case LOCAL_VAR: {
+        Node *tempEnv = env;
+        int depth = getVarDepth(node);
+        for (int i = 0; i < depth; i++) {
+            tempEnv = getLeft(tempEnv);
         }
-        EnvEntry *var = getEnvEntry(varName);
+        int idx = getVarIndex(node);
+        return getLocalsArray(tempEnv)[idx];
+    }
+    
+    case GLOBAL_VAR: {
+        EnvEntry *var = getEnvEntry(getVarName(node));
         if (var == NULL) {
             printf("Runtime Error: Undefined variable '%s'\n", getVarName(node));
             exit(1);
@@ -32,13 +32,12 @@ Node *evaluate(Node *node, LocalEnv *env) {
         if (var->isFunc == 1 || var->isFunc == 2) {
             return node; // Return the function identifier node as-is!
         }
-
         return evaluate(var->val.node, env);
     }
 
     case FUNCTION: { // This is an APPLICATION node
         Node *funcNode = evaluate(getLeft(node), env); // Get the function to run
-        if (getNodeType(funcNode) != VARIABLE) {
+        if (getNodeType(funcNode) != GLOBAL_VAR) {
             printf("Runtime Error: Not a function!\n");
             exit(1);
         }
@@ -57,13 +56,14 @@ Node *evaluate(Node *node, LocalEnv *env) {
             result = eval(getRight(node), env); // Args are in right
 
         } else if (func->isFunc == 2) { // User-Defined Function
-            LocalEnv newEnv;
-            newEnv.varName = getVarName(getLeft(func->params));
-            newEnv.value = evaluate(getLeft(getRight(node)), env);
-            pushRoot(newEnv.value); // PROTECT FROM GC!
-            newEnv.next = env;
-            result = evaluate(func->val.node, &newEnv);
-            popRoot(); // UNPROTECT
+            Node *argValue = evaluate(getLeft(getRight(node)), env);
+            pushRoot(argValue); // PROTECT FROM GC!
+            Node *newEnv = createEnvFrame(1, env);
+            getLocalsArray(newEnv)[0] = argValue;
+            popRoot(); // UNPROTECT arg
+            pushRoot(newEnv);
+            result = evaluate(func->val.node, newEnv);
+            popRoot(); // UNPROTECT env
         } else {
             printf("Runtime Error: '%s' is not a function!\n", func->key);
             exit(1);
@@ -73,6 +73,7 @@ Node *evaluate(Node *node, LocalEnv *env) {
     }
 
     case LIST:
+    case ENV_FRAME:
     default:
         return node;
     }

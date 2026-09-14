@@ -3,7 +3,7 @@
 
 static VMAPI vm;
 
-Node *nativeAdd(Node *args, struct LocalEnv *env) {
+Node *nativeAdd(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -14,7 +14,7 @@ Node *nativeAdd(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeSub(Node *args, struct LocalEnv *env) {
+Node *nativeSub(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -25,7 +25,7 @@ Node *nativeSub(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeMul(Node *args, struct LocalEnv *env) {
+Node *nativeMul(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -36,7 +36,7 @@ Node *nativeMul(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeDiv(Node *args, struct LocalEnv *env) {
+Node *nativeDiv(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -47,7 +47,7 @@ Node *nativeDiv(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeLessThan(Node *args, struct LocalEnv *env) {
+Node *nativeLessThan(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -58,7 +58,7 @@ Node *nativeLessThan(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeGreaterThan(Node *args, struct LocalEnv *env) {
+Node *nativeGreaterThan(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -69,7 +69,7 @@ Node *nativeGreaterThan(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeEquals(Node *args, struct LocalEnv *env) {
+Node *nativeEquals(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -80,7 +80,7 @@ Node *nativeEquals(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeAnd(Node *args, struct LocalEnv *env) {
+Node *nativeAnd(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -96,7 +96,7 @@ Node *nativeAnd(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeOr(Node *args, struct LocalEnv *env) {
+Node *nativeOr(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *right = vm.getLeft(vm.getRight(args));
     Node *l = vm.evaluate(left, env);
@@ -112,7 +112,7 @@ Node *nativeOr(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeNot(Node *args, struct LocalEnv *env) {
+Node *nativeNot(Node *args, Node *env) {
     Node *left = vm.getLeft(args);
     Node *l = vm.evaluate(left, env);
     vm.pushRoot(l);
@@ -121,7 +121,7 @@ Node *nativeNot(Node *args, struct LocalEnv *env) {
     return res;
 }
 
-Node *nativeIf(Node *args, struct LocalEnv *env) {
+Node *nativeIf(Node *args, Node *env) {
     Node *condition = vm.getLeft(args);
     Node *trueBranch = vm.getLeft(vm.getRight(args));
     Node *falseBranch = vm.getLeft(vm.getRight(vm.getRight(args)));
