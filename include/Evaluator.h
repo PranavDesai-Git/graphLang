@@ -4,7 +4,7 @@
 #include "TreeNode.h"
 #include "Environment.h"
 
-Node *evaluate(Node *node, LocalEnv *env);
+Node *evaluate(Node *node, Node *env);
 Node *copyTree(Node *root);
 Node *substitute(Node *root, char *paramName, Node *argValue);
 

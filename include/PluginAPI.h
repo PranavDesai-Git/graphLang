@@ -6,10 +6,11 @@
 struct LocalEnv;
 
 typedef struct {
-    void (*registerNative)(char *name, Node *(*func)(Node *args, struct LocalEnv *env));
-    Node *(*evaluate)(Node *node, struct LocalEnv *env);
+    void (*registerNative)(char *name, Node *(*func)(Node *args, Node *env));
+    Node *(*evaluate)(Node *node, Node *env);
     Node *(*createLiteral)(int value);
-    Node *(*createVariable)(char *varName);
+    Node *(*createGlobalVar)(char *varName);
+    Node *(*createLocalVar)(int depth, int index);
     Node *(*createFunction)(Node *funcExpr, Node *args);
     Node *(*createList)(int value, Node *nextNode);
     Node *(*copyTree)(Node *root);

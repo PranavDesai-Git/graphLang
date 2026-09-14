@@ -1,6 +1,6 @@
 #include "Environment.h"
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 EnvEntry *envTable[ENV_SIZE];
 
@@ -60,7 +60,7 @@ void registerNative(char *name, Func cFunc) {
     envInsert(entry);
 }
 
-void defineVariable(char* name, Node* value) {
+void defineVariable(char *name, Node *value) {
     EnvEntry *entry = malloc(sizeof(EnvEntry));
     entry->key = name;
     entry->params = NULL;
@@ -70,7 +70,7 @@ void defineVariable(char* name, Node* value) {
     envInsert(entry);
 }
 
-void defineFunction(char* name, Node* params, Node* body) {
+void defineFunction(char *name, Node *params, Node *body) {
     EnvEntry *entry = malloc(sizeof(EnvEntry));
     entry->key = name;
     entry->params = params;
@@ -79,3 +79,4 @@ void defineFunction(char* name, Node* params, Node* body) {
     entry->next = NULL;
     envInsert(entry);
 }
+
