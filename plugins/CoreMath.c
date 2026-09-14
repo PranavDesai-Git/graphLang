@@ -3,130 +3,96 @@
 
 static VMAPI vm;
 
-Node *nativeAdd(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(l) + vm.getLiteral(r));
-    vm.popRoot();
-    return res;
+Handle nativeAdd(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(l) + vm.getLiteral(r));
 }
 
-Node *nativeSub(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(l) - vm.getLiteral(r));
-    vm.popRoot();
-    return res;
+Handle nativeSub(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(l) - vm.getLiteral(r));
 }
 
-Node *nativeMul(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(l) * vm.getLiteral(r));
-    vm.popRoot();
-    return res;
+Handle nativeMul(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(l) * vm.getLiteral(r));
 }
 
-Node *nativeDiv(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(l) / vm.getLiteral(r));
-    vm.popRoot();
-    return res;
+Handle nativeDiv(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(l) / vm.getLiteral(r));
 }
 
-Node *nativeLessThan(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(l) < vm.getLiteral(r) ? 1 : 0);
-    vm.popRoot();
-    return res;
+Handle nativeLessThan(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(l) < vm.getLiteral(r) ? 1 : 0);
 }
 
-Node *nativeGreaterThan(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(l) > vm.getLiteral(r) ? 1 : 0);
-    vm.popRoot();
-    return res;
+Handle nativeGreaterThan(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(l) > vm.getLiteral(r) ? 1 : 0);
 }
 
-Node *nativeEquals(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(l) == vm.getLiteral(r) ? 1 : 0);
-    vm.popRoot();
-    return res;
+Handle nativeEquals(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(l) == vm.getLiteral(r) ? 1 : 0);
 }
 
-Node *nativeAnd(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
+Handle nativeAnd(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
     if (vm.getLiteral(l) == 0) {
-        Node *res = vm.createLiteral(0);
-        vm.popRoot();
-        return res;
+        return vm.createLiteral(0);
     }
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(r) != 0 ? 1 : 0);
-    vm.popRoot();
-    return res;
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(r) != 0 ? 1 : 0);
 }
 
-Node *nativeOr(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *right = vm.getLeft(vm.getRight(args));
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
+Handle nativeOr(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle right = vm.getLeft(vm.getRight(args));
+    Handle l = vm.evaluate(left, env);
     if (vm.getLiteral(l) != 0) {
-        Node *res = vm.createLiteral(1);
-        vm.popRoot();
-        return res;
+        return vm.createLiteral(1);
     }
-    Node *r = vm.evaluate(right, env);
-    Node *res = vm.createLiteral(vm.getLiteral(r) != 0 ? 1 : 0);
-    vm.popRoot();
-    return res;
+    Handle r = vm.evaluate(right, env);
+    return vm.createLiteral(vm.getLiteral(r) != 0 ? 1 : 0);
 }
 
-Node *nativeNot(Node *args, Node *env) {
-    Node *left = vm.getLeft(args);
-    Node *l = vm.evaluate(left, env);
-    vm.pushRoot(l);
-    Node *res = vm.createLiteral(vm.getLiteral(l) == 0 ? 1 : 0);
-    vm.popRoot();
-    return res;
+Handle nativeNot(Handle args, Handle env) {
+    Handle left = vm.getLeft(args);
+    Handle l = vm.evaluate(left, env);
+    return vm.createLiteral(vm.getLiteral(l) == 0 ? 1 : 0);
 }
 
-Node *nativeIf(Node *args, Node *env) {
-    Node *condition = vm.getLeft(args);
-    Node *trueBranch = vm.getLeft(vm.getRight(args));
-    Node *falseBranch = vm.getLeft(vm.getRight(vm.getRight(args)));
+Handle nativeIf(Handle args, Handle env) {
+    Handle condition = vm.getLeft(args);
+    Handle trueBranch = vm.getLeft(vm.getRight(args));
+    Handle falseBranch = vm.getLeft(vm.getRight(vm.getRight(args)));
 
-    Node *cond = vm.evaluate(condition, env);
+    Handle cond = vm.evaluate(condition, env);
     if (vm.getLiteral(cond) == 1) {
         return vm.evaluate(trueBranch, env);
     } else {
