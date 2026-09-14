@@ -4,7 +4,6 @@ An experimental, blazing fast purely functional Graph Reduction Virtual Machine 
 
 ## Roadmap & Upcoming Features
 
-- [ ] Move Environments to the GC Heap (AST Nodes for true Closures)
 - [ ] Implement Cheney's Copying GC (O(1) Allocation & Zero-pause Sweeps)
 - [ ] Implement the Accumulator Pattern (Tail Recursion)
 - [ ] Add Tail Call Optimization (TCO) with a Trampoline
@@ -46,9 +45,10 @@ Built-in operations (like math) are loaded at runtime via the `CoreMath.so` plug
 ### Strict Binary Tree
 Everything in GraphLang is a strict binary tree. Function calls take exactly two arguments (mapped directly to the `left` and `right` AST node pointers), and arbitrary argument lists are constructed using standard Cons cells (`LIST` nodes).
 
-### Lexical Scoping & Environments
-Instead of relying on a global hashtable or tree rewriting (which is slow and destroys function blueprints), GraphLang evaluates variables using **Lexical Scoping**. 
-When a user-defined function is called, the VM creates a new `LocalEnv` binding on the C stack (which will soon be moved to the GC heap to support true Closures) and links it to the parent environment.
+### Lexical Scoping & Flat Closures
+Instead of relying on a global hashtable or slow linked-list lookups, GraphLang uses **Lexical Addressing** and Flat Closures. 
+When a function is called, the VM allocates an `ENV_FRAME` array directly on the Garbage Collector's heap. Variables are resolved down to a physical array index `O(1)` during semantic analysis, eliminating all string operations at runtime. 
+Because these frames are fully traced AST nodes, GraphLang natively supports first-class functions, closures, and currying without fear of C-stack destruction!
 
 ### Strict Evaluation (Call-by-Value)
 GraphLang uses strict **Call-by-Value** evaluation. Arguments passed to functions are fully evaluated in the caller's environment before being bound to the new scope. This prevents infinite loops (the Funarg problem) and ensures predictable execution speed.
