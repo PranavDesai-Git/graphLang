@@ -65,12 +65,27 @@ Node *evaluate(Node *node, Node *env) {
             result = gcRoots[resH];
             rootCount = scope; // Close Handle Scope
         } else if (func->isFunc == 2) { // User-Defined Function
-            Node *argValue = evaluate(getLeft(getRight(node)), env);
-            pushRoot(argValue); // PROTECT FROM GC!
-            Node *newEnv = createEnvFrame(1, env);
-            getLocalsArray(newEnv)[0] = argValue;
-            popRoot(); // UNPROTECT arg
-            pushRoot(newEnv);
+            // Count arguments
+            int argCount = 0;
+            Node *temp = getRight(node);
+            while (temp != NULL && getNodeType(temp) == LIST) {
+                argCount++;
+                temp = getRight(temp);
+            }
+
+            // Create environment frame and protect it immediately
+            Node *newEnv = createEnvFrame(argCount, env);
+            pushRoot(newEnv); 
+
+            // Evaluate arguments and store them
+            temp = getRight(node);
+            int i = 0;
+            while (temp != NULL && getNodeType(temp) == LIST) {
+                Node *argValue = evaluate(getLeft(temp), env);
+                getLocalsArray(newEnv)[i++] = argValue;
+                temp = getRight(temp);
+            }
+
             result = evaluate(func->val.node, newEnv);
             popRoot(); // UNPROTECT env
         } else {
