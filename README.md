@@ -15,15 +15,12 @@ GraphLang is a minimal, fast, integer-only programming language. At its core, it
 
 ## Syntax Design
 
-GraphLang uses a clean, modern LL(1) syntax. The parser distinguishes between variables and functions dynamically by using a single token of lookahead:
+GraphLang uses a clean, minimalistic Lisp-style syntax (S-expressions). Because everything in the VM evaluates to a strict binary tree, S-expressions map exactly 1-to-1 to the underlying Graph Reduction architecture, making parsing trivial and evaluation lightning fast.
 
-- **Variable Definition:** `def x = 10`
-- **Function Definition:** `def add(a, b) = a + b`
-- **Variable Usage:** `x + 5` (Evaluates to 15)
-- **Function Call:** `add(x, 5)`
-- **Comments:** Any text following a single quote `'` is ignored by the lexer.
-
-Because function calls are always followed by parentheses or arguments, the parser can easily differentiate them from variables.
+- **Function Definition:** `(define fib (n) (? (< n 2) n (+ (fib (- n 1)) (fib (- n 2)))))`
+- **Variable Usage:** `x`
+- **Function Call:** `(+ 5 10)`
+- **Comments:** Any text following a semicolon `;` is ignored by the lexer.
 
 ## Operational Rules
 
