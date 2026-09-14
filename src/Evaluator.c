@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "PluginAPI.h"
 
 Node *evaluate(Node *node, Node *env) {
     if (node == NULL)
@@ -52,9 +53,17 @@ Node *evaluate(Node *node, Node *env) {
         Node *result;
 
         if (func->isFunc == 1) { // Native C Function
-            Func eval = func->val.func;
-            result = eval(getRight(node), env); // Args are in right
+            int scope = rootCount; // Open Handle Scope
+            pushRoot(getRight(node));
+            Handle argsH = rootCount - 1;
+            pushRoot(env);
+            Handle envH = rootCount - 1;
 
+            Handle (*plugin_func)(Handle, Handle) = (Handle (*)(Handle, Handle))func->val.func;
+            Handle resH = plugin_func(argsH, envH);
+
+            result = gcRoots[resH];
+            rootCount = scope; // Close Handle Scope
         } else if (func->isFunc == 2) { // User-Defined Function
             Node *argValue = evaluate(getLeft(getRight(node)), env);
             pushRoot(argValue); // PROTECT FROM GC!

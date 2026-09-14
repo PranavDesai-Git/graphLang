@@ -3,6 +3,7 @@
 #include "Evaluator.h"
 #include "GarbageCollector.h"
 #include "PluginAPI.h"
+#include "PluginAPIHandle.h"
 #include "TreeNode.h"
 #include <dlfcn.h>
 #include <stdio.h>
@@ -31,86 +32,72 @@ void loadPlugin(const char *path, VMAPI api) {
 }
 
 int main(void) {
-    // TEST PROGRAM ADDS SHIT
-    VMAPI api = {.registerNative = registerNative,
-                 .evaluate = evaluate,
-                 .createLiteral = createLiteral,
-                 .createGlobalVar = createGlobalVar,
-                 .createLocalVar = createLocalVar,
-                 .createFunction = createFunction,
-                 .pushRoot = pushRoot,
-                 .popRoot = popRoot,
-                 .createList = createList,
-                 .copyTree = copyTree,
-                 .getNodeType = getNodeType,
-                 .getLeft = getLeft,
-                 .getRight = getRight,
-                 .getLiteral = getLiteral,
-                 .getVarName = getVarName,
-                 .getFuncName = getFuncName};
-    // hardcoded for now
-    loadPlugin("./out/CoreMath.so", api);
+    VMAPI api = getHandleAPI();
 
-    printf("Starting GraphLang VM...\n");
+// hardcoded for now
+loadPlugin("./out/CoreMath.so", api);
 
-    initAllocator();
+printf("Starting GraphLang VM...\n");
 
-    // condition: n < 2
-    Node *cond =
-        createFunction(createGlobalVar("<"),
-                       createArgs2(createLocalVar(0, 0), createLiteral(2)));
+initAllocator();
 
-    // true branch: n
-    Node *trueBranch = createLocalVar(0, 0);
+// condition: n < 2
+Node *cond = createFunction(
+    createGlobalVar("<"), createArgs2(createLocalVar(0, 0), createLiteral(2)));
 
-    // false branch: fib(n-1) + fib(n-2)
-    Node *fib_n_minus_1 = createFunction(
-        createGlobalVar("fib"),
-        createArgs1(createFunction(
-            createGlobalVar("-"),
-            createArgs2(createLocalVar(0, 0), createLiteral(1)))));
+// true branch: n
+Node *trueBranch = createLocalVar(0, 0);
 
-    Node *fib_n_minus_2 = createFunction(
-        createGlobalVar("fib"),
-        createArgs1(createFunction(
-            createGlobalVar("-"),
-            createArgs2(createLocalVar(0, 0), createLiteral(2)))));
+// false branch: fib(n-1) + fib(n-2)
+Node *fib_n_minus_1 =
+    createFunction(createGlobalVar("fib"),
+                   createArgs1(createFunction(
+                       createGlobalVar("-"),
+                       createArgs2(createLocalVar(0, 0), createLiteral(1)))));
 
-    Node *falseBranch = createFunction(
-        createGlobalVar("+"), createArgs2(fib_n_minus_1, fib_n_minus_2));
+Node *fib_n_minus_2 =
+    createFunction(createGlobalVar("fib"),
+                   createArgs1(createFunction(
+                       createGlobalVar("-"),
+                       createArgs2(createLocalVar(0, 0), createLiteral(2)))));
 
-    Node *fibBody = createFunction(createGlobalVar("?"),
-                                   createArgs3(cond, trueBranch, falseBranch));
+Node *falseBranch = createFunction(createGlobalVar("+"),
+                                   createArgs2(fib_n_minus_1, fib_n_minus_2));
 
-    Node *paramsList = createList(0, NULL);
-    setLeft(paramsList, createGlobalVar("n")); // Parameter name is still a string (global var type temporarily handles this)
-    defineFunction("fib", paramsList, fibBody);
+Node *fibBody = createFunction(createGlobalVar("?"),
+                               createArgs3(cond, trueBranch, falseBranch));
 
-    // fib(25)
-    Node *mainCall =
-        createFunction(createGlobalVar("fib"), createArgs1(createLiteral(25)));
+Node *paramsList = createList(0, NULL);
+setLeft(paramsList,
+        createGlobalVar("n")); // Parameter name is still a string (global
+                               // var type temporarily handles this)
+defineFunction("fib", paramsList, fibBody);
 
-    defineVariable("main", mainCall);
+// fib(25)
+Node *mainCall =
+    createFunction(createGlobalVar("fib"), createArgs1(createLiteral(25)));
 
-    printf("Building AST for fib(n)...\n");
-    printf("Evaluating fib(25)... \n\n");
-    enableGC();
+defineVariable("main", mainCall);
 
-    clock_t start = clock();
-    Node *result = evaluate(mainCall, NULL);
-    clock_t end = clock();
+printf("Building AST for fib(n)...\n");
+printf("Evaluating fib(25)... \n\n");
+enableGC();
 
-    double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
-    printf("\n=== RESULT: %d ===\n", getLiteral(result));
-    printf("=== TIME: %f seconds ===\n\n", time_spent);
+clock_t start = clock();
+Node *result = evaluate(mainCall, NULL);
+clock_t end = clock();
 
-    printf("Running Final GC Pass...\n");
-    markAll();
-    sweep();
-    printf("GC Complete! Dead nodes successfully recycled.\n");
+double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
+printf("\n=== RESULT: %d ===\n", getLiteral(result));
+printf("=== TIME: %f seconds ===\n\n", time_spent);
 
-    freeAllChunks();
-    printf("VM Shutdown safely.\n");
+printf("Running Final GC Pass...\n");
+markAll();
+sweep();
+printf("GC Complete! Dead nodes successfully recycled.\n");
 
-    return 0;
+freeAllChunks();
+printf("VM Shutdown safely.\n");
+
+return 0;
 }
