@@ -4,25 +4,26 @@
 #include "TreeNode.h"
 
 struct LocalEnv;
+typedef int Handle;
 
 typedef struct {
-    void (*registerNative)(char *name, Node *(*func)(Node *args, Node *env));
-    Node *(*evaluate)(Node *node, Node *env);
-    Node *(*createLiteral)(int value);
-    Node *(*createGlobalVar)(char *varName);
-    Node *(*createLocalVar)(int depth, int index);
-    Node *(*createFunction)(Node *funcExpr, Node *args);
-    Node *(*createList)(int value, Node *nextNode);
-    Node *(*copyTree)(Node *root);
-    void (*pushRoot)(Node *node);
+    void (*registerNative)(char *name, Handle (*func)(Handle args, Handle env));
+    Handle (*evaluate)(Handle node, Handle env);
+    Handle (*createLiteral)(int value);
+    Handle (*createGlobalVar)(char *varName);
+    Handle (*createLocalVar)(int depth, int index);
+    Handle (*createFunction)(Handle funcExpr, Handle args);
+    Handle (*createList)(int value, Handle nextNode);
+    Handle (*copyTree)(Handle root);
+    void (*pushRoot)(Handle node);
     void (*popRoot)(void);
 
-    NodeType (*getNodeType)(Node *n);
-    Node *(*getLeft)(Node *n);
-    Node *(*getRight)(Node *n);
-    int (*getLiteral)(Node *n);
-    char *(*getVarName)(Node *n);
-    char *(*getFuncName)(Node *n);
+    NodeType (*getNodeType)(Handle n);
+    Handle (*getLeft)(Handle n);
+    Handle (*getRight)(Handle n);
+    int (*getLiteral)(Handle n);
+    char *(*getVarName)(Handle n);
+    char *(*getFuncName)(Handle n);
 } VMAPI;
 
 #endif

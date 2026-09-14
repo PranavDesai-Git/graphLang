@@ -12,5 +12,7 @@ void popRoot(void);
 void enableGC(void);
 
 extern int gcEnabled;
+extern Node *gcRoots[];
+extern int rootCount;
 
 #endif
