@@ -32,8 +32,15 @@ void markNode(Node *n) {
         return;
 
     n->statusFlags |= FLAG_GC_MARKD;
-    if (n->type == LITERAL)
+    if (n->type == LITERAL || n->type == GLOBAL_VAR || n->type == LOCAL_VAR)
         return;
+
+    if (n->type == ENV_FRAME) {
+        int count = n->errorFlags;
+        for (int i = 0; i < count; i++) {
+            markNode(n->data.locals[i]);
+        }
+    }
 
     markNode(n->left);
     markNode(n->right);

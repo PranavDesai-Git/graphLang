@@ -103,6 +103,10 @@ void sweep(void) {
                     tempNode->statusFlags &= ~FLAG_GC_MARKD;
                 } else {
                     tempNode->statusFlags &= ~FLAG_ALLOCATED;
+                    if (tempNode->type == ENV_FRAME) {
+                        free(tempNode->data.locals);
+                        tempNode->data.locals = NULL;
+                    }
                     pushFreeList(tempNode);
                 }
             }
