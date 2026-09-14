@@ -23,7 +23,7 @@ $(PLUGIN): plugins/CoreMath.c | $(OBJDIR)
 	$(CC) -shared -fPIC -Iinclude $< -o $@
 
 $(TARGET): $(OBJS)
-	$(CC) $(CFLAGS) $^ -o $@ -ldl
+	$(CC) $(CFLAGS) $^ -o $@ -ldl -lreadline
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.c | $(OBJDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
