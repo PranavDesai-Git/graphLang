@@ -46,15 +46,31 @@ Node *createClosure(Node *params, Node *body, Node *env) {
 
 Node *createNativeFunc(void *cFunc) {
     Node *n = allocNode();
-    n->type = NATIVE_FUNC;
+    n->type = FOREIGN;
     n->data.userdata = cFunc;
     return n;
 }
 
-Node *createList(int value, Node *nextNode) {
+Node *createDefine(char *varName, Node *valueExpr) {
     Node *n = allocNode();
-    n->type = LIST;
-    n->data.listLiteral = value;
+    n->type = DEFINE;
+    n->data.var = varName;
+    n->left = valueExpr;
+    return n;
+}
+
+Node *createLambda(Node *params, Node *body) {
+    Node *n = allocNode();
+    n->type = LAMBDA;
+    n->left = params;
+    n->right = body;
+    return n;
+}
+
+Node *createCons(int value, Node *nextNode) {
+    Node *n = allocNode();
+    n->type = CONS;
+    n->data.consLiteral = value;
     n->right = nextNode;
     return n;
 }
@@ -103,33 +119,33 @@ Node *substitute(Node *root, char *paramName, Node *argValue) {
 }
 
 Node *createArgs1(Node *arg1) {
-    Node *l1 = createList(0, NULL);
+    Node *l1 = createCons(0, NULL);
     l1->left = arg1;
     return l1;
 }
 
 Node *createArgs2(Node *arg1, Node *arg2) {
-    Node *l2 = createList(0, NULL);
+    Node *l2 = createCons(0, NULL);
     l2->left = arg2;
-    Node *l1 = createList(0, l2);
+    Node *l1 = createCons(0, l2);
     l1->left = arg1;
     return l1;
 }
 
 Node *createArgs3(Node *arg1, Node *arg2, Node *arg3) {
-    Node *l3 = createList(0, NULL);
+    Node *l3 = createCons(0, NULL);
     l3->left = arg3;
-    Node *l2 = createList(0, l3);
+    Node *l2 = createCons(0, l3);
     l2->left = arg2;
-    Node *l1 = createList(0, l2);
+    Node *l1 = createCons(0, l2);
     l1->left = arg1;
     return l1;
 }
 
-Node *createUserData(int typeID, int subType, Node *left, Node *right,
+Node *createForeign(int typeID, int subType, Node *left, Node *right,
                      void *rawData) {
     Node *n = allocNode();
-    n->type = USER_DATA;
+    n->type = FOREIGN;
     n->infoFlags = typeID;
     n->errorFlags = subType;
     n->data.userdata = rawData;

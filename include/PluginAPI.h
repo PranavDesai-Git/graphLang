@@ -14,7 +14,7 @@ typedef struct {
     Handle (*createGlobalVar)(char *varName);
     Handle (*createLocalVar)(int depth, int index);
     Handle (*createFunction)(Handle funcExpr, Handle args);
-    Handle (*createList)(int value, Handle nextNode);
+    Handle (*createCons)(int value, Handle nextNode);
     Handle (*copyTree)(Handle root);
     void (*pushRoot)(Handle node);
     void (*popRoot)(void);
@@ -26,7 +26,7 @@ typedef struct {
     char *(*getVarName)(Handle n);
     char *(*getFuncName)(Handle n);
 
-    Handle (*createUserData)(int typeID, int subType, Handle left, Handle right,
+    Handle (*createForeign)(int typeID, int subType, Handle left, Handle right,
                              void *rawData);
     void *(*getUserData)(Handle n);
     int (*getTypeID)(Handle n);

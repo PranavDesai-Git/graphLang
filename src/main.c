@@ -24,7 +24,7 @@ int TYPE_IO; // Populated during initialization
 jmp_buf error_jmp;
 
 Node *executeIO(Node *action) {
-    while (action != NULL && getNodeType(action) == USER_DATA &&
+    while (action != NULL && getNodeType(action) == FOREIGN &&
            getTypeID(action) == TYPE_IO) {
         int subType = getSubType(action);
 
@@ -45,7 +45,7 @@ Node *executeIO(Node *action) {
             Node *res1 = executeIO(firstAction);
 
             // Apply callback to res1
-            Node *args = createList(0, NULL);
+            Node *args = createCons(0, NULL);
             setLeft(args, res1);
             Node *call = createCall(callback, args);
 

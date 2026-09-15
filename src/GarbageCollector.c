@@ -55,11 +55,8 @@ void markAll(void) {
         EnvEntry *temp = envTable[i];
 
         while (temp != NULL) {
-            if (temp->isFunc == 0 && temp->val.node != NULL) {
-                markNode(temp->val.node);
-            } else if (temp->isFunc == 2) {
-                markNode(temp->val.node);
-                markNode(temp->params);
+            if (temp->val != NULL) {
+                markNode(temp->val);
             }
             temp = temp->next;
         }

@@ -37,10 +37,10 @@ Node *evaluate(Node *node, Node *env) {
 
     case CALL: { 
         Node *funcNode = evaluate(getLeft(node), env); 
+        pushRoot(funcNode);
+        Node *result = NULL;
         
-        Node *result;
-        
-        if (getNodeType(funcNode) == NATIVE_FUNC) { 
+        if (getNodeType(funcNode) == FOREIGN) { 
             int scope = rootCount; 
             pushRoot(getRight(node));
             Handle argsH = rootCount - 1;
@@ -55,7 +55,7 @@ Node *evaluate(Node *node, Node *env) {
         } else if (getNodeType(funcNode) == CLOSURE) { 
             int argCount = 0;
             Node *temp = getRight(node);
-            while (temp != NULL && getNodeType(temp) == LIST) {
+            while (temp != NULL && getNodeType(temp) == CONS) {
                 argCount++;
                 temp = getRight(temp);
             }
@@ -65,7 +65,7 @@ Node *evaluate(Node *node, Node *env) {
 
             temp = getRight(node);
             int i = 0;
-            while (temp != NULL && getNodeType(temp) == LIST) {
+            while (temp != NULL && getNodeType(temp) == CONS) {
                 Node *argValue = evaluate(getLeft(temp), env);
                 getLocalsArray(newEnv)[i++] = argValue;
                 temp = getRight(temp);
@@ -78,12 +78,24 @@ Node *evaluate(Node *node, Node *env) {
             longjmp(error_jmp, 1);
         }
 
+        popRoot(); // funcNode
         return result;
     }
 
-    case LIST:
+    case CONS:
     case ENV_FRAME:
     default:
         return node;
+
+    case LAMBDA: {
+        Node *closure = createClosure(getLeft(node), getRight(node), env);
+        return closure;
+    }
+    
+    case DEFINE: {
+        Node *value = evaluate(getLeft(node), env);
+        defineVariable(getVarName(node), value);
+        return value;
+    }
     }
 }

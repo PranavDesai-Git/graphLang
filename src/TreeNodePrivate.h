@@ -10,7 +10,7 @@ struct Node {
         char *var;
         int index;
         char *call;
-        int listLiteral;
+        int consLiteral;
         struct Node **locals;
         void *userdata;
         struct Node *closure;

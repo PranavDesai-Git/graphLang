@@ -1,0 +1,8 @@
+set pagination off
+break parse
+run < test.lisp
+break evaluate
+continue
+continue
+info locals
+print result

@@ -6,11 +6,12 @@ typedef enum {
     GLOBAL_VAR,
     LOCAL_VAR,
     CALL,
-    LIST,
+    CONS,
     ENV_FRAME,
-    USER_DATA,
+    FOREIGN,
     CLOSURE,
-    NATIVE_FUNC
+    DEFINE,
+    LAMBDA
 } NodeType;
 
 typedef struct Node Node;
@@ -23,7 +24,7 @@ union {
     int literal;
     char *var;
     char *func;
-    int listLiteral;
+    int consLiteral;
 } data;
 
 NodeType type;
@@ -54,14 +55,16 @@ Node *createLocalVar(int depth, int index);
 Node *createCall(Node *funcExpr, Node *args);
 Node *createClosure(Node *params, Node *body, Node *env);
 Node *createNativeFunc(void *cFunc);
-Node *createList(int value, Node *nextNode);
+Node *createDefine(char *varName, Node *valueExpr);
+Node *createLambda(Node *params, Node *body);
+Node *createCons(int value, Node *nextNode);
 Node *createEnvFrame(int size, Node *parentScope);
 Node *createArgs1(Node *arg1);
 Node *createArgs2(Node *arg1, Node *arg2);
 Node *createArgs3(Node *arg1, Node *arg2, Node *arg3);
 Node *getCapturedEnv(Node *n);
 
-Node *createUserData(int typeID, int subType, Node *left, Node *right,
+Node *createForeign(int typeID, int subType, Node *left, Node *right,
                      void *rawData);
 void *getUserData(Node *n);
 int getTypeID(Node *n);

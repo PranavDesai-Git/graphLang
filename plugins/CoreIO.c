@@ -12,13 +12,13 @@ static VMAPI vm;
 Handle nativeIOReturn(Handle args, Handle env) {
     Handle val = vm.getLeft(args);
     Handle evalVal = vm.evaluate(val, env);
-    return vm.createUserData(TYPE_IO, IO_RETURN, evalVal, 0, NULL);
+    return vm.createForeign(TYPE_IO, IO_RETURN, evalVal, 0, NULL);
 }
 
 Handle nativeIOPrint(Handle args, Handle env) {
     Handle val = vm.getLeft(args);
     Handle evalVal = vm.evaluate(val, env);
-    return vm.createUserData(TYPE_IO, IO_PRINT, evalVal, 0, NULL);
+    return vm.createForeign(TYPE_IO, IO_PRINT, evalVal, 0, NULL);
 }
 
 Handle nativeIOBind(Handle args, Handle env) {
@@ -29,7 +29,7 @@ Handle nativeIOBind(Handle args, Handle env) {
     Handle evalAction = vm.evaluate(action, env);
     Handle evalCallback = vm.evaluate(callback, env);
     
-    return vm.createUserData(TYPE_IO, IO_BIND, evalAction, evalCallback, NULL);
+    return vm.createForeign(TYPE_IO, IO_BIND, evalAction, evalCallback, NULL);
 }
 
 Handle nativeIOSeq(Handle args, Handle env) {
@@ -39,7 +39,7 @@ Handle nativeIOSeq(Handle args, Handle env) {
     Handle evalAction1 = vm.evaluate(action1, env);
     Handle evalAction2 = vm.evaluate(action2, env);
     
-    return vm.createUserData(TYPE_IO, IO_SEQ, evalAction1, evalAction2, NULL);
+    return vm.createForeign(TYPE_IO, IO_SEQ, evalAction1, evalAction2, NULL);
 }
 
 void initPlugin(VMAPI providedApi) {

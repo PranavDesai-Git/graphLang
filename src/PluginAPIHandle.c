@@ -48,8 +48,8 @@ static Handle api_createFunction(Handle funcExpr, Handle args) {
         createCall(resolveHandle(funcExpr), resolveHandle(args)));
 }
 
-static Handle api_createList(int value, Handle nextNode) {
-    return makeHandle(createList(value, resolveHandle(nextNode)));
+static Handle api_createCons(int value, Handle nextNode) {
+    return makeHandle(createCons(value, resolveHandle(nextNode)));
 }
 
 static Handle api_copyTree(Handle root) {
@@ -99,11 +99,11 @@ static char *api_getFuncName(Handle n) {
     return getFuncName(node);
 }
 
-static Handle api_createUserData(int typeID, int subType, Handle leftH,
+static Handle api_createForeign(int typeID, int subType, Handle leftH,
                                  Handle rightH, void *rawData) {
     Node *left = (leftH >= 0 && leftH < rootCount) ? gcRoots[leftH] : NULL;
     Node *right = (rightH >= 0 && rightH < rootCount) ? gcRoots[rightH] : NULL;
-    Node *res = createUserData(typeID, subType, left, right, rawData);
+    Node *res = createForeign(typeID, subType, left, right, rawData);
     pushRoot(res);
     return rootCount - 1;
 }
@@ -136,7 +136,7 @@ VMAPI getHandleAPI(void) {
                  .createGlobalVar = api_createGlobalVar,
                  .createLocalVar = api_createLocalVar,
                  .createFunction = api_createFunction,
-                 .createList = api_createList,
+                 .createCons = api_createCons,
                  .copyTree = api_copyTree,
                  .pushRoot = api_pushRoot,
                  .popRoot = api_popRoot,
@@ -146,7 +146,7 @@ VMAPI getHandleAPI(void) {
                  .getLiteral = api_getLiteral,
                  .getVarName = api_getVarName,
                  .getFuncName = api_getFuncName,
-                 .createUserData = api_createUserData,
+                 .createForeign = api_createForeign,
                  .getUserData = api_getUserData,
                  .getTypeID = api_getTypeID,
                  .getSubType = api_getSubType};
