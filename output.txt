@@ -1,25 +1,0 @@
-Successfully loaded plugin: ./out/CoreMath.so
-Successfully loaded plugin: ./out/CoreIO.so
-Starting GraphLang VM...
-
-[1;36m==============================[0m
-[1;32m   GraphLang Interactive REPL   [0m
-[1;36m==============================[0m
-Type your Lisp expressions below. (Ctrl+C to exit)
-
-[1;33mλ > [0m(define sum (n)[1;33mλ > [0m(define sum (n)
-[1;33m  > [0m        (? (< n 2)[1;33m  > [0m        (? (< n 2)
-[1;33m  > [0m                n
-[1;33m  > [0m                (+ n (sum (- n 1)[1;33m  > [0m                (+ n (sum (- n 1))[1;33m  > [0m                (+ n (sum (- n 1)))[1;33m  > [0m                (+ n (sum (- n 1)))
-[1;33m  > [0m                )
-[1;33m  > [0m        )
-[1;33m  > [0m
-[1;33mλ > [0m(define rep (x)[1;33mλ > [0m(define rep (x)
-[1;33m  > [0m        (? (< x 1)[1;33m  > [0m        (? (< x 1)(io.print x)[1;33m  > [0m        (? (< x 1)(io.print x)(io.bind (io.print (sum (- x 1)[1;33m  > [0m        (? (< x 1)(io.print x)(io.bind (io.print (sum (- x 1))[1;33m  > [0m        (? (< x 1)(io.print x)(io.bind (io.print (sum (- x 1)))[1;33m  > [0m        (? (< x 1)(io.print x)(io.bind (io.print (sum (- x 1))))[1;33m  > [0m        (? (< x 1)(io.print x)(io.bind (io.print (sum (- x 1)))))[1;33m  > [0m        [1;33m  > [0m        (? (< x 1)(io.print x)(io.bind (io.print (sum (- x 1))))))
-[1;33m  > [0m
-[1;33mλ > [0m(rep 30)[1;33mλ > [0m[1;33mλ > [0m(rep 30)
-[1;33m  > [0m
-Evaluating expression...
-435
-Runtime Error: Not a function!
-[1;33mλ > [0mVM Shutdown safely.
