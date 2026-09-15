@@ -111,12 +111,8 @@ static void *api_getUserData(Handle n) { return getUserData(gcRoots[n]); }
 static int api_getTypeID(Handle n) { return getTypeID(gcRoots[n]); }
 static int api_getSubType(Handle n) { return getSubType(gcRoots[n]); }
 
-// ==========================================
-// TYPE REGISTRY
-// ==========================================
-
 static char *typeRegistry[256];
-static int typeCount = 100; // Start issuing IDs from 100
+static int typeCount = 100;
 
 int api_registerType(const char *typeName) {
     for (int i = 100; i < typeCount; i++) {
@@ -124,7 +120,8 @@ int api_registerType(const char *typeName) {
             return i;
         }
     }
-    if (typeCount >= 256 + 100) return -1;
+    if (typeCount >= 256 + 100)
+        return -1;
     typeRegistry[typeCount] = malloc(strlen(typeName) + 1);
     strcpy(typeRegistry[typeCount], typeName);
     return typeCount++;
