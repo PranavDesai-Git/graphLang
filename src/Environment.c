@@ -1,4 +1,5 @@
 #include "Environment.h"
+#include "TreeNode.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -24,8 +25,6 @@ void envInsert(EnvEntry *newEntry) {
     while (temp != NULL) {
         if (strcmp(temp->key, newEntry->key) == 0) {
             temp->val = newEntry->val;
-            temp->isFunc = newEntry->isFunc;
-            temp->params = newEntry->params;
             free(newEntry);
             return;
         }
@@ -51,32 +50,14 @@ EnvEntry *getEnvEntry(char *key) {
     }
     return NULL;
 }
-
-void registerNative(char *name, Func cFunc) {
-    EnvEntry *entry = malloc(sizeof(EnvEntry));
-    entry->key = name;
-    entry->isFunc = 1;
-    entry->val.func = cFunc;
-    envInsert(entry);
-}
-
 void defineVariable(char *name, Node *value) {
     EnvEntry *entry = malloc(sizeof(EnvEntry));
     entry->key = name;
-    entry->params = NULL;
-    entry->isFunc = 0;
-    entry->val.node = value;
+    entry->val = value;
     entry->next = NULL;
     envInsert(entry);
 }
 
-void defineFunction(char *name, Node *params, Node *body) {
-    EnvEntry *entry = malloc(sizeof(EnvEntry));
-    entry->key = name;
-    entry->params = params;
-    entry->isFunc = 2; // User-defined!
-    entry->val.node = body;
-    entry->next = NULL;
-    envInsert(entry);
+void registerNative(char *name, void *cFunc) {
+    defineVariable(name, createNativeFunc(cFunc));
 }
-

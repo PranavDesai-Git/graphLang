@@ -137,5 +137,12 @@ int getVarDepth(Node *n) { return n ? n->infoFlags : 0; }
 Node **getLocalsArray(Node *n) { return n ? n->data.locals : NULL; }
 int getLocalsCount(Node *n) { return n ? n->errorFlags : 0; }
 
-void setLeft(Node *n, Node *left) { if (n) n->left = left; }
-void setRight(Node *n, Node *right) { if (n) n->right = right; }
+void setLeft(Node *n, Node *left) {
+    if (n)
+        n->left = left;
+}
+void setRight(Node *n, Node *right) {
+    if (n)
+        n->right = right;
+}
+Node *getCapturedEnv(Node *n) { return n ? n->data.closure : NULL; }

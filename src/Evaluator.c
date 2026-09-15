@@ -32,10 +32,7 @@ Node *evaluate(Node *node, Node *env) {
             printf("Runtime Error: Undefined variable '%s'\n", getVarName(node));
             longjmp(error_jmp, 1);
         }
-        if (var->isFunc == 1 || var->isFunc == 2) {
-            return node; // Return the function identifier node as-is!
-        }
-        return evaluate(var->val.node, env);
+        return var->val;
     }
 
     case FUNCTION: { // This is an APPLICATION node
