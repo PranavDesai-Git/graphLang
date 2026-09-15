@@ -60,6 +60,9 @@ static Node *resolveVariable(CompilerScope *scope, Token name) {
 }
 
 static Node *parseExpression(CompilerScope *scope) {
+    if (currentToken.type == TOKEN_EOF) {
+        return NULL;
+    }
 
     if (currentToken.type == TOKEN_NUMBER) {
         int val = atoi(currentToken.start);
@@ -244,7 +247,8 @@ static Node *parseExpression(CompilerScope *scope) {
         return result;
     }
 
-    printf("Parse Error: Unexpected token!\n");
+    printf("Parse Error: Unexpected token! type=%d len=%d text=%.*s\n", 
+           currentToken.type, currentToken.length, currentToken.length, currentToken.start);
     longjmp(error_jmp, 1);
 }
 

@@ -88,7 +88,7 @@ void loadPlugin(const char *path, VMAPI api) {
     printf("Successfully loaded plugin: %s\n", path);
 }
 
-int main(void) {
+int main(int argc, char **argv) {
     VMAPI api = getHandleAPI();
 
     // Register our IO Type dynamically before plugins load
@@ -98,11 +98,42 @@ int main(void) {
     loadPlugin("./out/CoreMath.so", api);
     loadPlugin("./out/CoreIO.so", api);
 
-    printf("Starting GraphLang VM...\n");
-
     initAllocator();
     enableGC();
 
+    if (argc > 1) {
+        FILE *file = fopen(argv[1], "rb");
+        if (file == NULL) {
+            printf("Error: Could not open file '%s'\n", argv[1]);
+            return 1;
+        }
+
+        fseek(file, 0, SEEK_END);
+        long fileSize = ftell(file);
+        rewind(file);
+
+        char *buffer = malloc(fileSize + 1);
+        if (buffer == NULL) {
+            printf("Error: Not enough memory to read file '%s'\n", argv[1]);
+            fclose(file);
+            return 1;
+        }
+
+        size_t bytesRead = fread(buffer, 1, fileSize, file);
+        buffer[bytesRead] = '\0';
+        fclose(file);
+
+        if (setjmp(error_jmp) == 0) {
+            parse(buffer);
+        } else {
+            printf("Caught parse error in file: %s\n", argv[1]);
+        }
+        
+        free(buffer);
+        return 0;
+    }
+
+    printf("Starting GraphLang VM...\n");
     printf("\n\033[1;36m==============================\033[0m\n");
     printf("\033[1;32m   GraphLang Interactive REPL   \033[0m\n");
     printf("\033[1;36m==============================\033[0m\n");
