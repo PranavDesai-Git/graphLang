@@ -1,14 +1,20 @@
 #include "PluginAPI.h"
 #include <stddef.h>
+#include <stdio.h>
 
 static VMAPI vm;
 
 Handle nativeAdd(Handle args, Handle env) {
     Handle left = vm.getLeft(args);
     Handle right = vm.getLeft(vm.getRight(args));
+
     Handle l = vm.evaluate(left, env);
     Handle r = vm.evaluate(right, env);
-    return vm.createLiteral(vm.getLiteral(l) + vm.getLiteral(r));
+
+    int l_val = vm.getLiteral(l);
+    int r_val = vm.getLiteral(r);
+
+    return vm.createLiteral(l_val + r_val);
 }
 
 Handle nativeSub(Handle args, Handle env) {

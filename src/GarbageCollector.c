@@ -40,6 +40,8 @@ void markNode(Node *n) {
         for (int i = 0; i < count; i++) {
             markNode(n->data.locals[i]);
         }
+    } else if (n->type == CLOSURE) {
+        markNode(n->data.closure);
     }
 
     markNode(n->left);
