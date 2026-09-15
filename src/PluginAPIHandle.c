@@ -5,6 +5,7 @@
 #include "TreeNode.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Helper to push a raw Node to the GC root stack and return its index
 static Handle makeHandle(Node *n) {
@@ -21,15 +22,8 @@ static Node *resolveHandle(Handle h) {
     return gcRoots[h];
 }
 
-// ==========================================
-// API WRAPPERS
-// ==========================================
-
 static void api_registerNative(char *name,
                                Handle (*func)(Handle args, Handle env)) {
-    // We cast the handle function back to the internal raw Node pointer
-    // function type. The Evaluator handles this gracefully when it unpacks the
-    // plugin return value.
     registerNative(name, (Func)func);
 }
 
@@ -72,32 +66,37 @@ static NodeType api_getNodeType(Handle n) {
 
 static Handle api_getLeft(Handle n) {
     Node *node = resolveHandle(n);
-    if (node == NULL) return -1;
+    if (node == NULL)
+        return -1;
     return makeHandle(getLeft(node));
 }
 
 static Handle api_getRight(Handle n) {
     Node *node = resolveHandle(n);
-    if (node == NULL) return -1;
+    if (node == NULL)
+        return -1;
     return makeHandle(getRight(node));
 }
 
-static int api_getLiteral(Handle n) { 
+static int api_getLiteral(Handle n) {
     Node *node = resolveHandle(n);
-    if (node == NULL) return 0;
-    return getLiteral(node); 
+    if (node == NULL)
+        return 0;
+    return getLiteral(node);
 }
 
-static char *api_getVarName(Handle n) { 
+static char *api_getVarName(Handle n) {
     Node *node = resolveHandle(n);
-    if (node == NULL) return NULL;
-    return getVarName(node); 
+    if (node == NULL)
+        return NULL;
+    return getVarName(node);
 }
 
-static char *api_getFuncName(Handle n) { 
+static char *api_getFuncName(Handle n) {
     Node *node = resolveHandle(n);
-    if (node == NULL) return NULL;
-    return getFuncName(node); 
+    if (node == NULL)
+        return NULL;
+    return getFuncName(node);
 }
 
 static Handle api_createUserData(int typeID, int subType, Handle leftH,
@@ -112,9 +111,29 @@ static void *api_getUserData(Handle n) { return getUserData(gcRoots[n]); }
 static int api_getTypeID(Handle n) { return getTypeID(gcRoots[n]); }
 static int api_getSubType(Handle n) { return getSubType(gcRoots[n]); }
 
+// ==========================================
+// TYPE REGISTRY
+// ==========================================
+
+static char *typeRegistry[256];
+static int typeCount = 100; // Start issuing IDs from 100
+
+int api_registerType(const char *typeName) {
+    for (int i = 100; i < typeCount; i++) {
+        if (strcmp(typeRegistry[i], typeName) == 0) {
+            return i;
+        }
+    }
+    if (typeCount >= 256 + 100) return -1;
+    typeRegistry[typeCount] = malloc(strlen(typeName) + 1);
+    strcpy(typeRegistry[typeCount], typeName);
+    return typeCount++;
+}
+
 // Return the fully wrapped API Struct
 VMAPI getHandleAPI(void) {
     VMAPI api = {.registerNative = api_registerNative,
+                 .registerType = api_registerType,
                  .evaluate = api_evaluate,
                  .createLiteral = api_createLiteral,
                  .createGlobalVar = api_createGlobalVar,

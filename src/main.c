@@ -13,11 +13,12 @@
 #include <string.h>
 #include <time.h>
 
-#define TYPE_IO 100
 #define IO_RETURN 0
 #define IO_PRINT 1
 #define IO_BIND 2
 #define IO_SEQ 3
+
+int TYPE_IO; // Populated during initialization
 
 jmp_buf error_jmp;
 
@@ -87,7 +88,10 @@ void loadPlugin(const char *path, VMAPI api) {
 int main(void) {
     VMAPI api = getHandleAPI();
 
-    // hardcoded for now
+    // Register our IO Type dynamically before plugins load
+    TYPE_IO = api_registerType("IO");
+
+    // Pre-load plugins
     loadPlugin("./out/CoreMath.so", api);
     loadPlugin("./out/CoreIO.so", api);
 

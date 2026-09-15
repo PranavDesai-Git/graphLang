@@ -1,12 +1,12 @@
 #include "PluginAPI.h"
 #include <stddef.h>
 
-#define TYPE_IO 100
 #define IO_RETURN 0
 #define IO_PRINT 1
 #define IO_BIND 2
 #define IO_SEQ 3
 
+static int TYPE_IO;
 static VMAPI vm;
 
 Handle nativeIOReturn(Handle args, Handle env) {
@@ -44,6 +44,7 @@ Handle nativeIOSeq(Handle args, Handle env) {
 
 void initPlugin(VMAPI providedApi) {
     vm = providedApi;
+    TYPE_IO = vm.registerType("IO");
     vm.registerNative("io.return", nativeIOReturn);
     vm.registerNative("io.print", nativeIOPrint);
     vm.registerNative("io.bind", nativeIOBind);

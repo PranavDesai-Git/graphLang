@@ -8,6 +8,7 @@ typedef int Handle;
 
 typedef struct {
     void (*registerNative)(char *name, Handle (*func)(Handle args, Handle env));
+    int (*registerType)(const char *typeName);
     Handle (*evaluate)(Handle node, Handle env);
     Handle (*createLiteral)(int value);
     Handle (*createGlobalVar)(char *varName);
