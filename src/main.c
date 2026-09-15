@@ -1,9 +1,10 @@
 #include "Allocator.h"
+#include "Evaluator.h"
 #include "GarbageCollector.h"
 #include "Parser.h"
 #include "PluginAPI.h"
 #include "PluginAPIHandle.h"
-#include "Evaluator.h"
+#include "TreeNode.h"
 #include <dlfcn.h>
 #include <stdio.h>
 #include <readline/history.h>
@@ -23,9 +24,10 @@ int TYPE_IO; // Populated during initialization
 jmp_buf error_jmp;
 
 Node *executeIO(Node *action) {
-    while (action != NULL && getNodeType(action) == USER_DATA && getTypeID(action) == TYPE_IO) {
+    while (action != NULL && getNodeType(action) == USER_DATA &&
+           getTypeID(action) == TYPE_IO) {
         int subType = getSubType(action);
-        
+
         if (subType == IO_RETURN) {
             return getLeft(action);
         } else if (subType == IO_PRINT) {
@@ -41,14 +43,15 @@ Node *executeIO(Node *action) {
             Node *callback = getRight(action);
 
             Node *res1 = executeIO(firstAction);
-            
+
             // Apply callback to res1
             Node *args = createList(0, NULL);
             setLeft(args, res1);
-            Node *call = createFunction(callback, args);
-            
+            Node *call = createCall(callback, args);
+
             pushRoot(call);
-            action = evaluate(call, NULL); // evaluate returns the next IO action!
+            action =
+                evaluate(call, NULL); // evaluate returns the next IO action!
             popRoot();
         } else if (subType == IO_SEQ) {
             Node *firstAction = getLeft(action);

@@ -24,7 +24,7 @@ static Node *resolveHandle(Handle h) {
 
 static void api_registerNative(char *name,
                                Handle (*func)(Handle args, Handle env)) {
-    registerNative(name, (Func)func);
+    registerNative(name, (void*)func);
 }
 
 static Handle api_evaluate(Handle node, Handle env) {
@@ -45,7 +45,7 @@ static Handle api_createLocalVar(int depth, int index) {
 
 static Handle api_createFunction(Handle funcExpr, Handle args) {
     return makeHandle(
-        createFunction(resolveHandle(funcExpr), resolveHandle(args)));
+        createCall(resolveHandle(funcExpr), resolveHandle(args)));
 }
 
 static Handle api_createList(int value, Handle nextNode) {

@@ -1,3 +1,4 @@
+#include "TreeNode.h"
 #include "Allocator.h"
 #include "GarbageCollector.h"
 #include "TreeNodePrivate.h"
@@ -26,11 +27,27 @@ Node *createLocalVar(int depth, int index) {
     return n;
 }
 
-Node *createFunction(Node *funcExpr, Node *args) {
+Node *createCall(Node *funcExpr, Node *args) {
     Node *n = allocNode();
-    n->type = FUNCTION;
+    n->type = CALL;
     n->left = funcExpr;
     n->right = args;
+    return n;
+}
+
+Node *createClosure(Node *params, Node *body, Node *env) {
+    Node *n = allocNode();
+    n->type = CLOSURE;
+    n->left = params;
+    n->right = body;
+    n->data.closure = env;
+    return n;
+}
+
+Node *createNativeFunc(void *cFunc) {
+    Node *n = allocNode();
+    n->type = NATIVE_FUNC;
+    n->data.userdata = cFunc;
     return n;
 }
 
@@ -130,7 +147,7 @@ Node *getLeft(Node *n) { return n ? n->left : NULL; }
 Node *getRight(Node *n) { return n ? n->right : NULL; }
 int getLiteral(Node *n) { return n ? n->data.literal : 0; }
 char *getVarName(Node *n) { return n ? n->data.var : NULL; }
-char *getFuncName(Node *n) { return n ? n->data.func : NULL; }
+char *getFuncName(Node *n) { return n ? n->data.call : NULL; }
 
 int getVarIndex(Node *n) { return n ? n->data.index : 0; }
 int getVarDepth(Node *n) { return n ? n->infoFlags : 0; }

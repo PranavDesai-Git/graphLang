@@ -9,10 +9,12 @@ struct Node {
         int literal;
         char *var;
         int index;
-        char *func;
+        char *call;
         int listLiteral;
         struct Node **locals;
         void *userdata;
+        struct Node *closure;
+        struct Node *nativeFunc;
     } data;
 
     NodeType type;

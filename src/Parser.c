@@ -1,13 +1,13 @@
 #include "Parser.h"
 #include "Environment.h"
-#include "Lexer.h"
-#include "TreeNode.h"
 #include "Evaluator.h"
 #include "GarbageCollector.h"
+#include "Lexer.h"
+#include "TreeNode.h"
+#include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <setjmp.h>
 extern jmp_buf error_jmp;
 
 static Token currentToken;
@@ -115,7 +115,8 @@ static Node *parseExpression(CompilerScope *scope) {
             memcpy(funcName, nameToken.start, nameToken.length);
             funcName[nameToken.length] = '\0';
 
-            defineFunction(funcName, paramsList, body);
+            Node *closure = createClosure(paramsList, body, NULL);
+            defineVariable(funcName, closure);
             popRoot();
             return NULL;
         }
@@ -137,7 +138,7 @@ static Node *parseExpression(CompilerScope *scope) {
         }
         consume(TOKEN_RPAREN, "Expected ')' at end of function call");
 
-        Node *result = createFunction(funcNode, argsList);
+        Node *result = createCall(funcNode, argsList);
         popRoot();
         popRoot();
         return result;
@@ -154,14 +155,15 @@ void parse(const char *source) {
         Node *expr = parseExpression(NULL);
         if (expr != NULL) {
             printf("Evaluating expression...\n");
-            
+
             // PROTECT THE PARSED AST FROM THE GC!
             pushRoot(expr);
             Node *result = evaluate(expr, NULL);
             popRoot();
 
             // Execute if it's an IO Action
-            if (result != NULL && getNodeType(result) == USER_DATA && getTypeID(result) == 100) {
+            if (result != NULL && getNodeType(result) == USER_DATA &&
+                getTypeID(result) == 100) {
                 result = executeIO(result);
             }
 

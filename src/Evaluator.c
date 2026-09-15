@@ -35,36 +35,24 @@ Node *evaluate(Node *node, Node *env) {
         return var->val;
     }
 
-    case FUNCTION: { // This is an APPLICATION node
-        Node *funcNode = evaluate(getLeft(node), env); // Get the function to run
-        if (getNodeType(funcNode) != GLOBAL_VAR) {
-            printf("Runtime Error: Not a function!\n");
-            longjmp(error_jmp, 1);
-        }
-
-        EnvEntry *func = getEnvEntry(getVarName(funcNode));
-        if (func == NULL) {
-            printf("Runtime Error: Undefined function '%s'\n",
-                   getVarName(funcNode));
-            longjmp(error_jmp, 1);
-        }
-
+    case CALL: { 
+        Node *funcNode = evaluate(getLeft(node), env); 
+        
         Node *result;
-
-        if (func->isFunc == 1) { // Native C Function
-            int scope = rootCount; // Open Handle Scope
+        
+        if (getNodeType(funcNode) == NATIVE_FUNC) { 
+            int scope = rootCount; 
             pushRoot(getRight(node));
             Handle argsH = rootCount - 1;
             pushRoot(env);
             Handle envH = rootCount - 1;
 
-            Handle (*plugin_func)(Handle, Handle) = (Handle (*)(Handle, Handle))func->val.func;
+            Handle (*plugin_func)(Handle, Handle) = (Handle (*)(Handle, Handle))getUserData(funcNode);
             Handle resH = plugin_func(argsH, envH);
 
             result = gcRoots[resH];
-            rootCount = scope; // Close Handle Scope
-        } else if (func->isFunc == 2) { // User-Defined Function
-            // Count arguments
+            rootCount = scope; 
+        } else if (getNodeType(funcNode) == CLOSURE) { 
             int argCount = 0;
             Node *temp = getRight(node);
             while (temp != NULL && getNodeType(temp) == LIST) {
@@ -72,11 +60,9 @@ Node *evaluate(Node *node, Node *env) {
                 temp = getRight(temp);
             }
 
-            // Create environment frame and protect it immediately
-            Node *newEnv = createEnvFrame(argCount, env);
+            Node *newEnv = createEnvFrame(argCount, getCapturedEnv(funcNode));
             pushRoot(newEnv); 
 
-            // Evaluate arguments and store them
             temp = getRight(node);
             int i = 0;
             while (temp != NULL && getNodeType(temp) == LIST) {
@@ -85,10 +71,10 @@ Node *evaluate(Node *node, Node *env) {
                 temp = getRight(temp);
             }
 
-            result = evaluate(func->val.node, newEnv);
-            popRoot(); // UNPROTECT env
+            result = evaluate(getRight(funcNode), newEnv);
+            popRoot(); 
         } else {
-            printf("Runtime Error: '%s' is not a function!\n", func->key);
+            printf("Runtime Error: Not a function!\n");
             longjmp(error_jmp, 1);
         }
 
