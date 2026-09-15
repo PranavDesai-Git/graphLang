@@ -85,7 +85,6 @@ void loadPlugin(const char *path, VMAPI api) {
         return;
     }
     initPlugin(api);
-    printf("Successfully loaded plugin: %s\n", path);
 }
 
 int main(int argc, char **argv) {

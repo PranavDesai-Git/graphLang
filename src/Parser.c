@@ -258,8 +258,6 @@ void parse(const char *source) {
     while (currentToken.type != TOKEN_EOF) {
         Node *expr = parseExpression(NULL);
         if (expr != NULL) {
-            printf("Evaluating expression...\n");
-
             // PROTECT THE PARSED AST FROM THE GC!
             pushRoot(expr);
             Node *result = evaluate(expr, NULL);
@@ -273,8 +271,6 @@ void parse(const char *source) {
 
             if (result != NULL && getNodeType(result) == LITERAL) {
                 printf("Result: %d\n", getLiteral(result));
-            } else if (result != NULL) {
-                printf("DEBUG: Result NodeType = %d\n", getNodeType(result));
             }
         }
     }
