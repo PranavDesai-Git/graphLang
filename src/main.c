@@ -87,15 +87,34 @@ void loadPlugin(const char *path, VMAPI api) {
     initPlugin(api);
 }
 
+#include <dirent.h>
+
+void loadAllPlugins(const char *dirPath, VMAPI api) {
+    DIR *dir = opendir(dirPath);
+    if (!dir) return;
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL) {
+        size_t len = strlen(entry->d_name);
+        if (len > 3 && strcmp(entry->d_name + len - 3, ".so") == 0) {
+            char path[1024];
+            snprintf(path, sizeof(path), "%s/%s", dirPath, entry->d_name);
+            loadPlugin(path, api);
+        }
+    }
+    closedir(dir);
+}
+
 int main(int argc, char **argv) {
     VMAPI api = getHandleAPI();
 
     // Register our IO Type dynamically before plugins load
     TYPE_IO = api_registerType("IO");
 
+    initEnvironment();
+
     // Pre-load plugins
-    loadPlugin("./out/CoreMath.so", api);
-    loadPlugin("./out/CoreIO.so", api);
+    loadAllPlugins("./out", api);
 
     initAllocator();
     enableGC();
@@ -138,7 +157,9 @@ int main(int argc, char **argv) {
     printf("\033[1;36m==============================\033[0m\n");
     printf("Type your Lisp expressions below. (Ctrl+C to exit)\n\n");
 
-    char buffer[4096] = {0};
+    char *buffer = NULL;
+    size_t bufferSize = 0;
+    size_t bufferLen = 0;
     int openParens = 0;
     int isMultiline = 0;
 
@@ -149,7 +170,8 @@ int main(int argc, char **argv) {
 
         if (!isMultiline) {
             input = readline("\001\033[1;33m\002λ > \001\033[0m\002");
-            buffer[0] = '\0';
+            bufferLen = 0;
+            if (buffer) buffer[0] = '\0';
         } else {
             char promptBuf[256];
             strcpy(promptBuf, "\001\033[1;33m\002  > \001\033[0m\002");
@@ -167,7 +189,7 @@ int main(int argc, char **argv) {
         // Empty line
         if (input[0] == '\0') {
             if (isMultiline) {
-                if (buffer[0] != '\0') {
+                if (buffer && buffer[0] != '\0') {
                     if (setjmp(error_jmp) == 0) {
                         parse(buffer);
                     }
@@ -194,10 +216,24 @@ int main(int argc, char **argv) {
         if (openParens < 0)
             openParens = 0;
 
-        strncat(buffer, input, sizeof(buffer) - strlen(buffer) - 2);
-        strcat(buffer, "\n"); // Add the newline back
+        size_t inputLen = strlen(input);
+        if (bufferLen + inputLen + 2 > bufferSize) {
+            bufferSize = bufferSize == 0 ? 4096 : bufferSize * 2 + inputLen + 2;
+            buffer = realloc(buffer, bufferSize);
+            if (!buffer) {
+                printf("Error: Out of memory\n");
+                exit(1);
+            }
+        }
+
+        strcpy(buffer + bufferLen, input);
+        bufferLen += inputLen;
+        buffer[bufferLen++] = '\n';
+        buffer[bufferLen] = '\0';
+
         free(input);
     }
+    if (buffer) free(buffer);
     printf("VM Shutdown safely.\n");
 
     return 0;
