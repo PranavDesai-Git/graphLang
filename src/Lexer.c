@@ -70,11 +70,20 @@ static Token number(void) {
     return makeToken(TOKEN_NUMBER);
 }
 
+static int isIdentifierChar(char c) {
+    return isalnum(c) || c == '_' || c == '+' || c == '-' || c == '*' ||
+           c == '/' || c == '<' || c == '>' || c == '=' || c == '?' ||
+           c == '!' || c == '&' || c == '|' || c == '.';
+}
+
+static int isIdentifierStart(char c) {
+    return isalpha(c) || c == '_' || c == '+' || c == '-' || c == '*' ||
+           c == '/' || c == '<' || c == '>' || c == '=' || c == '?' ||
+           c == '!' || c == '&' || c == '|';
+}
+
 static Token identifier(void) {
-    while (isalnum(peek()) || peek() == '_' || peek() == '+' || peek() == '-' ||
-           peek() == '*' || peek() == '/' || peek() == '<' || peek() == '>' ||
-           peek() == '=' || peek() == '?' || peek() == '!' || peek() == '&' ||
-           peek() == '|' || peek() == '.') {
+    while (isIdentifierChar(peek())) {
         advance();
     }
     return makeToken(TOKEN_IDENTIFIER);
@@ -91,9 +100,7 @@ Token scanToken(void) {
 
     if (isdigit(c))
         return number();
-    if (isalpha(c) || c == '+' || c == '-' || c == '*' || c == '/' ||
-        c == '<' || c == '>' || c == '=' || c == '?' || c == '!' || c == '&' ||
-        c == '|') {
+    if (isIdentifierStart(c)) {
         return identifier();
     }
 
