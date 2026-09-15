@@ -10,13 +10,35 @@
 #include <string.h>
 extern jmp_buf error_jmp;
 
+extern int TYPE_IO;
+
 static Token currentToken;
 
 typedef struct CompilerScope {
     struct CompilerScope *parent;
-    Token locals[100];
+    Token *locals;
     int localCount;
+    int localCapacity;
 } CompilerScope;
+
+static void pushLocal(CompilerScope *scope, Token token) {
+    if (scope->localCount >= scope->localCapacity) {
+        scope->localCapacity = scope->localCapacity == 0 ? 8 : scope->localCapacity * 2;
+        scope->locals = realloc(scope->locals, sizeof(Token) * scope->localCapacity);
+    }
+    scope->locals[scope->localCount++] = token;
+}
+
+static void freeScope(CompilerScope *scope) {
+    if (scope->locals) {
+        free(scope->locals);
+    }
+}
+
+static int tokenEquals(Token t, const char *str) {
+    size_t len = strlen(str);
+    return t.length == len && memcmp(t.start, str, len) == 0;
+}
 
 static void advance(void) {
     currentToken = scanToken();
@@ -79,8 +101,7 @@ static Node *parseExpression(CompilerScope *scope) {
     if (currentToken.type == TOKEN_LPAREN) {
         advance();
 
-        if (currentToken.type == TOKEN_IDENTIFIER && currentToken.length == 6 &&
-            memcmp(currentToken.start, "define", 6) == 0) {
+        if (currentToken.type == TOKEN_IDENTIFIER && tokenEquals(currentToken, "define")) {
 
             advance();
 
@@ -88,14 +109,14 @@ static Node *parseExpression(CompilerScope *scope) {
             consume(TOKEN_IDENTIFIER, "Expected function name");
 
             consume(TOKEN_LPAREN, "Expected '(' before parameters");
-            CompilerScope funcScope = {.parent = scope, .localCount = 0};
+            CompilerScope funcScope = {.parent = scope, .locals = NULL, .localCount = 0, .localCapacity = 0};
 
             Node *paramsList = createCons(0, NULL);
             pushRoot(paramsList);
             Node *currParam = paramsList;
 
             while (currentToken.type != TOKEN_RPAREN) {
-                funcScope.locals[funcScope.localCount++] = currentToken;
+                pushLocal(&funcScope, currentToken);
 
                 char *pName = malloc(currentToken.length + 1);
                 memcpy(pName, currentToken.start, currentToken.length);
@@ -112,6 +133,8 @@ static Node *parseExpression(CompilerScope *scope) {
             consume(TOKEN_RPAREN, "Expected ')' after parameters");
 
             Node *body = parseExpression(&funcScope);
+            freeScope(&funcScope);
+            
             pushRoot(body);
             consume(TOKEN_RPAREN, "Expected ')' at end of define");
 
@@ -128,19 +151,18 @@ static Node *parseExpression(CompilerScope *scope) {
             return defNode;
         }
 
-        if (currentToken.type == TOKEN_IDENTIFIER && currentToken.length == 6 &&
-            memcmp(currentToken.start, "lambda", 6) == 0) {
+        if (currentToken.type == TOKEN_IDENTIFIER && tokenEquals(currentToken, "lambda")) {
 
             advance();
             consume(TOKEN_LPAREN, "Expected '(' before parameters");
-            CompilerScope funcScope = {.parent = scope, .localCount = 0};
+            CompilerScope funcScope = {.parent = scope, .locals = NULL, .localCount = 0, .localCapacity = 0};
 
             Node *paramsList = createCons(0, NULL);
             pushRoot(paramsList);
             Node *currParam = paramsList;
 
             while (currentToken.type != TOKEN_RPAREN) {
-                funcScope.locals[funcScope.localCount++] = currentToken;
+                pushLocal(&funcScope, currentToken);
 
                 char *pName = malloc(currentToken.length + 1);
                 memcpy(pName, currentToken.start, currentToken.length);
@@ -157,6 +179,8 @@ static Node *parseExpression(CompilerScope *scope) {
             consume(TOKEN_RPAREN, "Expected ')' after parameters");
 
             Node *body = parseExpression(&funcScope);
+            freeScope(&funcScope);
+            
             pushRoot(body);
             consume(TOKEN_RPAREN, "Expected ')' at end of lambda");
 
@@ -165,12 +189,11 @@ static Node *parseExpression(CompilerScope *scope) {
             popRoot(); // paramsList
             return lambda;
         }
-        if (currentToken.type == TOKEN_IDENTIFIER && currentToken.length == 3 &&
-            memcmp(currentToken.start, "let", 3) == 0) {
+        if (currentToken.type == TOKEN_IDENTIFIER && tokenEquals(currentToken, "let")) {
 
             advance();
             consume(TOKEN_LPAREN, "Expected '(' before let bindings");
-            CompilerScope funcScope = {.parent = scope, .localCount = 0};
+            CompilerScope funcScope = {.parent = scope, .locals = NULL, .localCount = 0, .localCapacity = 0};
 
             Node *paramsList = createCons(0, NULL);
             pushRoot(paramsList);
@@ -186,7 +209,7 @@ static Node *parseExpression(CompilerScope *scope) {
                 Token varName = currentToken;
                 consume(TOKEN_IDENTIFIER, "Expected variable name in let binding");
                 
-                funcScope.locals[funcScope.localCount++] = varName;
+                pushLocal(&funcScope, varName);
                 
                 char *pName = malloc(varName.length + 1);
                 memcpy(pName, varName.start, varName.length);
@@ -210,6 +233,8 @@ static Node *parseExpression(CompilerScope *scope) {
             consume(TOKEN_RPAREN, "Expected ')' after let bindings");
 
             Node *body = parseExpression(&funcScope);
+            freeScope(&funcScope);
+
             pushRoot(body);
             consume(TOKEN_RPAREN, "Expected ')' at end of let");
 
@@ -265,7 +290,7 @@ void parse(const char *source) {
 
             // Execute if it's an IO Action
             if (result != NULL && getNodeType(result) == FOREIGN &&
-                getTypeID(result) == 100) {
+                getTypeID(result) == TYPE_IO) {
                 result = executeIO(result);
             }
 
