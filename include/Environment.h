@@ -4,15 +4,16 @@
 #include "TreeNode.h"
 #include <stdint.h>
 
-#define ENV_SIZE 1024
-
 typedef struct EnvEntry {
     char *key;
     Node *val;
     struct EnvEntry *next;
 } EnvEntry;
 
-extern EnvEntry *envTable[ENV_SIZE];
+extern EnvEntry **envTable;
+extern int envSize;
+
+void initEnvironment(void);
 
 void envInsert(EnvEntry *entry);
 EnvEntry *getEnvEntry(char *key);

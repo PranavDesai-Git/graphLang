@@ -2,6 +2,8 @@
 #include "TreeNodePrivate.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <setjmp.h>
+extern jmp_buf error_jmp;
 
 #define CHUNK_SIZE 1024
 
@@ -21,7 +23,7 @@ Chunk *createChunk(void) {
     Chunk *newChunk = malloc(sizeof(Chunk));
     if (newChunk == NULL) {
         printf("CRITICAL ERROR: OS out of memory!\n");
-        exit(1);
+        longjmp(error_jmp, 1);
     }
     newChunk->next = NULL;
     return newChunk;

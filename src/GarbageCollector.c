@@ -3,6 +3,8 @@
 #include "TreeNodePrivate.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <setjmp.h>
+extern jmp_buf error_jmp;
 
 int gcEnabled = 0;
 void enableGC(void) { gcEnabled = 1; }
@@ -16,7 +18,7 @@ void pushRoot(Node *node) {
         gcRoots[rootCount++] = node;
     } else {
         printf("Fatal Error: Shadow Stack Overflow!\n");
-        exit(1);
+        longjmp(error_jmp, 1);
     }
 }
 
@@ -53,7 +55,7 @@ void markAll(void) {
         markNode(gcRoots[i]);
     }
 
-    for (int i = 0; i < ENV_SIZE; i++) {
+    for (int i = 0; i < envSize; i++) {
         EnvEntry *temp = envTable[i];
 
         while (temp != NULL) {

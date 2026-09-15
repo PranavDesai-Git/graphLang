@@ -3,21 +3,51 @@
 #include <stdlib.h>
 #include <string.h>
 
-EnvEntry *envTable[ENV_SIZE];
+int envSize = 1024;
+int envCount = 0;
+EnvEntry **envTable = NULL;
+
+void initEnvironment(void) {
+    envTable = calloc(envSize, sizeof(EnvEntry*));
+}
 
 unsigned long hashString(char *str) {
     unsigned long hash = 5381;
     int c;
     while ((c = *str++))
         hash = ((hash << 5) + hash) + c;
-    return hash % ENV_SIZE;
+    return hash % envSize;
+}
+
+void envResize(void) {
+    int oldSize = envSize;
+    EnvEntry **oldTable = envTable;
+    
+    envSize *= 2;
+    envTable = calloc(envSize, sizeof(EnvEntry*));
+    
+    for (int i = 0; i < oldSize; i++) {
+        EnvEntry *temp = oldTable[i];
+        while (temp != NULL) {
+            EnvEntry *next = temp->next;
+            int pos = hashString(temp->key);
+            temp->next = envTable[pos];
+            envTable[pos] = temp;
+            temp = next;
+        }
+    }
+    free(oldTable);
 }
 
 void envInsert(EnvEntry *newEntry) {
+    if (envCount >= envSize * 0.75) {
+        envResize();
+    }
     int pos = hashString(newEntry->key);
 
     if (envTable[pos] == NULL) {
         envTable[pos] = newEntry;
+        envCount++;
         return;
     }
 
@@ -36,6 +66,7 @@ void envInsert(EnvEntry *newEntry) {
     }
 
     temp->next = newEntry;
+    envCount++;
 }
 
 EnvEntry *getEnvEntry(char *key) {
