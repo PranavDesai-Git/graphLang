@@ -1,7 +1,10 @@
 ### 15-09-26
-- [ ] Implement Lambdas
-- [ ] Local Variables using Let (might reuse the same for lambdas)
-- [ ] Dynamic Dispatch from types and ret
+- [x] Implement Lambdas
+- [x] Local Variables using Let (might reuse the same for lambdas)
 - [x] Prevent typeID collisions. 
-- [ ] Do redefinition checks in parser and crash on redefinition
 
+### GraphLang v1.0 Roadmap
+- [ ] **CoreList Plugin**: Implement `car`, `cdr`, and `is_null` to enable list manipulation.
+- [ ] **Standard Library (`std.lisp`)**: Implement functional utilities like `map`, `filter`, `fold`, and `length`.
+- [ ] **CoreString Plugin**: Implement a `FOREIGN` string type with operations like `str.make`, `str.concat`, and `str.len`.
+- [ ] **Fix Memory Leaks**: Clean up leaked `malloc` variable names in `Parser.c` and `Environment.c`.
