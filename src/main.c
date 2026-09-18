@@ -141,9 +141,11 @@ int main(int argc, char **argv) {
         buffer[bytesRead] = '\0';
         fclose(file);
 
+        int savedRootCount = rootCount;
         if (setjmp(error_jmp) == 0) {
             parse(buffer);
         } else {
+            rootCount = savedRootCount;
             printf("Caught parse error in file: %s\n", argv[1]);
         }
         
@@ -190,8 +192,12 @@ int main(int argc, char **argv) {
         if (input[0] == '\0') {
             if (isMultiline) {
                 if (buffer && buffer[0] != '\0') {
+                    int savedRootCount = rootCount;
                     if (setjmp(error_jmp) == 0) {
                         parse(buffer);
+                    } else {
+                        rootCount = savedRootCount;
+                        printf("Parse error.\n");
                     }
                 }
                 isMultiline = 0;

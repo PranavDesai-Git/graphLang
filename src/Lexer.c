@@ -98,7 +98,7 @@ Token scanToken(void) {
 
     char c = advance();
 
-    if (isdigit(c))
+    if (isdigit(c) || (c == '-' && isdigit(peek())))
         return number();
     if (isIdentifierStart(c)) {
         return identifier();
