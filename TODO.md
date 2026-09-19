@@ -5,6 +5,6 @@
 
 ### GraphLang v1.0 Roadmap
 - [x] **CoreList Plugin**: Implement `car`, `cdr`, and `is_null` to enable list manipulation.
-- [ ] **Standard Library (`std.lisp`)**: Implement functional utilities like `map`, `filter`, `fold`, and `length`.
+- [x] **Standard Library (`std.lisp`)**: Implement functional utilities like `map`, `filter`, `fold`, and `length`.
 - [ ] **CoreString Plugin**: Implement a `FOREIGN` string type with operations like `str.make`, `str.concat`, and `str.len`.
 - [ ] **Fix Memory Leaks**: Clean up leaked `malloc` variable names in `Parser.c` and `Environment.c`.
