@@ -2,20 +2,9 @@
 
 A minimal, fast, functional-leaning Lisp dialect and Virtual Machine written in C.
 
-## GraphLang v1.0 Roadmap
-
-- [x] **CoreList Plugin**: Implement `car`, `cdr`, and `is_null` to enable list manipulation.
-- [x] **Standard Library (`std.lisp`)**: Implement functional utilities like `map`, `filter`, `fold`, and `length`.
-- [x] **CoreString Plugin**: Implement a `FOREIGN` string type with operations like `str.make`, `str.concat`, and `str.len`.
-- [x] **Fix Memory Leaks**: Clean up leaked `malloc` variable names in the parser and environment.
-
-## GraphLang v1.1 Features (Completed)
-
-- [x] **File I/O**: Read and write files natively (`file.read`, `file.write`).
-- [x] **Network Sockets**: Raw TCP sockets (`net.listen`, `net.accept`, `net.send`, `net.recv`).
-- [x] **String Literals**: Native parsing for `"double-quoted"` strings in the lexer.
-- [x] **Module Imports**: Reentrant parser state to support `(import "filename")`.
-- [x] **Variadic C-API**: Unpacking API `vm.unpackArgs` for seamless C plugin authoring.
+```lisp
+(io.print_str "Hello World!")
+```
 
 *(For future v2.0 architectural plans, including JIT and Actor Model concurrency, see [ideas.md](ideas.md))*
 
