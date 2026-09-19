@@ -8,3 +8,7 @@
 - [x] **Standard Library (`std.lisp`)**: Implement functional utilities like `map`, `filter`, `fold`, and `length`.
 - [x] **CoreString Plugin**: Implement a `FOREIGN` string type with operations like `str.make`, `str.concat`, and `str.len`.
 - [x] **Fix Memory Leaks**: Clean up leaked `malloc` variable names in `Parser.c` and `Environment.c`.
+
+### GraphLang v1.1
+- [x] **File I/O**: Implemented `file.read` and `file.write` in `CoreFile` plugin.
+- [x] **Network Sockets**: Implemented raw TCP sockets in `CoreNet` plugin.

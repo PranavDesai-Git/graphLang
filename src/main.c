@@ -18,6 +18,7 @@
 #define IO_PRINT 1
 #define IO_BIND 2
 #define IO_SEQ 3
+#define IO_PRINT_STR 4
 
 int TYPE_IO; // Populated during initialization
 
@@ -36,6 +37,13 @@ Node *executeIO(Node *action) {
                 printf("%d\n", getLiteral(val));
             } else {
                 printf("<non-literal output>\n");
+            }
+            return NULL; // unit
+        } else if (subType == IO_PRINT_STR) {
+            Node *val = getLeft(action);
+            if (getNodeType(val) == FOREIGN) {
+                char *str = (char*)getUserData(val);
+                if (str) printf("%s\n", str);
             }
             return NULL; // unit
         } else if (subType == IO_BIND) {
