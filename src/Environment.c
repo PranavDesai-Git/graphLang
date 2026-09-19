@@ -1,3 +1,4 @@
+#define _POSIX_C_SOURCE 200809L
 #include "Environment.h"
 #include "TreeNode.h"
 #include <stdlib.h>
@@ -55,6 +56,7 @@ void envInsert(EnvEntry *newEntry) {
     while (temp != NULL) {
         if (strcmp(temp->key, newEntry->key) == 0) {
             temp->val = newEntry->val;
+            free(newEntry->key);
             free(newEntry);
             return;
         }
@@ -83,7 +85,7 @@ EnvEntry *getEnvEntry(char *key) {
 }
 void defineVariable(char *name, Node *value) {
     EnvEntry *entry = malloc(sizeof(EnvEntry));
-    entry->key = name;
+    entry->key = strdup(name);
     entry->val = value;
     entry->next = NULL;
     envInsert(entry);

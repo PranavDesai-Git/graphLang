@@ -108,6 +108,11 @@ void sweep(void) {
                     if (tempNode->type == ENV_FRAME) {
                         free(tempNode->data.locals);
                         tempNode->data.locals = NULL;
+                    } else if (tempNode->type == GLOBAL_VAR || tempNode->type == DEFINE) {
+                        if (tempNode->data.var != NULL) {
+                            free(tempNode->data.var);
+                            tempNode->data.var = NULL;
+                        }
                     } else if (tempNode->type == FOREIGN) {
                         if (tempNode->data.userdata != NULL) {
                             free(tempNode->data.userdata);
