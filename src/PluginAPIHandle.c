@@ -78,6 +78,20 @@ static Handle api_getRight(Handle n) {
     return makeHandle(getRight(node));
 }
 
+static void api_setLeft(Handle n, Handle left) {
+    Node *node = resolveHandle(n);
+    if (node != NULL) {
+        setLeft(node, resolveHandle(left));
+    }
+}
+
+static void api_setRight(Handle n, Handle right) {
+    Node *node = resolveHandle(n);
+    if (node != NULL) {
+        setRight(node, resolveHandle(right));
+    }
+}
+
 static int api_getLiteral(Handle n) {
     Node *node = resolveHandle(n);
     if (node == NULL)
@@ -143,6 +157,8 @@ VMAPI getHandleAPI(void) {
                  .getNodeType = api_getNodeType,
                  .getLeft = api_getLeft,
                  .getRight = api_getRight,
+                 .setLeft = api_setLeft,
+                 .setRight = api_setRight,
                  .getLiteral = api_getLiteral,
                  .getVarName = api_getVarName,
                  .getFuncName = api_getFuncName,

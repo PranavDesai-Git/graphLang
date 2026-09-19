@@ -22,6 +22,8 @@ typedef struct {
     NodeType (*getNodeType)(Handle n);
     Handle (*getLeft)(Handle n);
     Handle (*getRight)(Handle n);
+    void (*setLeft)(Handle n, Handle left);
+    void (*setRight)(Handle n, Handle right);
     int (*getLiteral)(Handle n);
     char *(*getVarName)(Handle n);
     char *(*getFuncName)(Handle n);
