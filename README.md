@@ -4,10 +4,10 @@ A minimal, fast, functional-leaning Lisp dialect and Virtual Machine written in 
 
 ## GraphLang v1.0 Roadmap
 
-- [ ] **CoreList Plugin**: Implement `car`, `cdr`, and `is_null` to enable list manipulation.
-- [ ] **Standard Library (`std.lisp`)**: Implement functional utilities like `map`, `filter`, `fold`, and `length`.
-- [ ] **CoreString Plugin**: Implement a `FOREIGN` string type with operations like `str.make`, `str.concat`, and `str.len`.
-- [ ] **Fix Memory Leaks**: Clean up leaked `malloc` variable names in the parser and environment.
+- [x] **CoreList Plugin**: Implement `car`, `cdr`, and `is_null` to enable list manipulation.
+- [x] **Standard Library (`std.lisp`)**: Implement functional utilities like `map`, `filter`, `fold`, and `length`.
+- [x] **CoreString Plugin**: Implement a `FOREIGN` string type with operations like `str.make`, `str.concat`, and `str.len`.
+- [x] **Fix Memory Leaks**: Clean up leaked `malloc` variable names in the parser and environment.
 
 *(For future v2.0 architectural plans, including JIT and Actor Model concurrency, see [ideas.md](ideas.md))*
 
