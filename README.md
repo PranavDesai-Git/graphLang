@@ -9,6 +9,14 @@ A minimal, fast, functional-leaning Lisp dialect and Virtual Machine written in 
 - [x] **CoreString Plugin**: Implement a `FOREIGN` string type with operations like `str.make`, `str.concat`, and `str.len`.
 - [x] **Fix Memory Leaks**: Clean up leaked `malloc` variable names in the parser and environment.
 
+## GraphLang v1.1 Features (Completed)
+
+- [x] **File I/O**: Read and write files natively (`file.read`, `file.write`).
+- [x] **Network Sockets**: Raw TCP sockets (`net.listen`, `net.accept`, `net.send`, `net.recv`).
+- [x] **String Literals**: Native parsing for `"double-quoted"` strings in the lexer.
+- [x] **Module Imports**: Reentrant parser state to support `(import "filename")`.
+- [x] **Variadic C-API**: Unpacking API `vm.unpackArgs` for seamless C plugin authoring.
+
 *(For future v2.0 architectural plans, including JIT and Actor Model concurrency, see [ideas.md](ideas.md))*
 
 GraphLang is a minimal, dynamically-typed programming language. At its core, it is an expression evaluator built entirely on a **strict binary tree**, with built-in support for variables, first-class functions, closures, and `let` bindings.
@@ -20,7 +28,34 @@ GraphLang uses a clean, minimalistic Lisp-style syntax (S-expressions). S-expres
 - **Function Definition:** `(define fib (n) (? (< n 2) n (+ (fib (- n 1)) (fib (- n 2)))))`
 - **Anonymous Functions:** `(lambda (x y) (+ x y))`
 - **Local Variables:** `(let ((x 10) (y 20)) (+ x y))`
+- **Strings and Imports:** `(import "std.lisp")` and `(io.print_str "Hello!")`
 - **Comments:** Any text following a semicolon `;` is ignored by the lexer.
+
+### Practical Examples
+
+**File Copying:**
+```lisp
+(define seq (a b) b)
+(seq 
+  (file.write "destination.txt" (file.read "source.txt"))
+  (io.print_str "File copied!"))
+```
+
+**Network Echo Server:**
+```lisp
+(define seq (a b) b)
+(define handle_client (client_sock)
+    (seq 
+        (net.send client_sock (net.recv client_sock 1024))
+        (net.close client_sock)))
+
+(define accept_loop (server_sock)
+    (seq
+        (handle_client (net.accept server_sock))
+        (accept_loop server_sock)))
+
+(accept_loop (net.listen 8080))
+```
 
 ## Operational Rules
 
