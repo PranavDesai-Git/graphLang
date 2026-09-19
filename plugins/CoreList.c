@@ -31,7 +31,7 @@ Handle nativeIsNull(Handle args, Handle env) {
     Handle listH = vm.getLeft(args);
     Handle l = vm.evaluate(listH, env);
     
-    if (l < 0 || vm.getNodeType(l) == (NodeType)-1) {
+    if (l < 0 || vm.getNodeType(l) == (NodeType)-1 || (vm.getNodeType(l) == 0 && vm.getLiteral(l) == 0)) {
         return vm.createLiteral(1);
     }
     return vm.createLiteral(0);
