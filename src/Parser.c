@@ -4,6 +4,7 @@
 #include "GarbageCollector.h"
 #include "Lexer.h"
 #include "TreeNode.h"
+#include "PluginAPIHandle.h"
 #include <setjmp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -90,6 +91,15 @@ static Node *parseExpression(CompilerScope *scope) {
         int val = atoi(currentToken.start);
         advance();
         return createLiteral(val);
+    }
+
+    if (currentToken.type == TOKEN_STRING) {
+        char *strVal = malloc(currentToken.length - 1);
+        memcpy(strVal, currentToken.start + 1, currentToken.length - 2);
+        strVal[currentToken.length - 2] = '\0';
+        advance();
+        int typeStr = api_registerType("String");
+        return createForeign(typeStr, 0, NULL, NULL, strVal);
     }
 
     if (currentToken.type == TOKEN_IDENTIFIER) {
@@ -278,6 +288,9 @@ static Node *parseExpression(CompilerScope *scope) {
 }
 
 void parse(const char *source) {
+    Token oldToken = currentToken;
+    pushLexerState();
+
     initLexer(source);
     advance();
     while (currentToken.type != TOKEN_EOF) {
@@ -299,4 +312,7 @@ void parse(const char *source) {
             }
         }
     }
+    
+    popLexerState();
+    currentToken = oldToken;
 }

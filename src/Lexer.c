@@ -2,16 +2,28 @@
 #include <ctype.h>
 #include <string.h>
 
-static struct {
+typedef struct {
     const char *start;
     const char *current;
     int line;
-} scanner;
+} LexerState;
+
+static LexerState scanner;
+static LexerState stateStack[16];
+static int stateStackCount = 0;
 
 void initLexer(const char *source) {
     scanner.start = source;
     scanner.current = source;
     scanner.line = 1;
+}
+
+void pushLexerState(void) {
+    stateStack[stateStackCount++] = scanner;
+}
+
+void popLexerState(void) {
+    scanner = stateStack[--stateStackCount];
 }
 
 static int isAtEnd(void) { return *scanner.current == '\0'; }
@@ -70,6 +82,16 @@ static Token number(void) {
     return makeToken(TOKEN_NUMBER);
 }
 
+static Token string(void) {
+    while (peek() != '"' && !isAtEnd()) {
+        if (peek() == '\n') scanner.line++;
+        advance();
+    }
+    if (isAtEnd()) return errorToken("Unterminated string.");
+    advance(); // closing quote
+    return makeToken(TOKEN_STRING);
+}
+
 static int isIdentifierChar(char c) {
     return isalnum(c) || c == '_' || c == '+' || c == '-' || c == '*' ||
            c == '/' || c == '<' || c == '>' || c == '=' || c == '?' ||
@@ -102,6 +124,9 @@ Token scanToken(void) {
         return number();
     if (isIdentifierStart(c)) {
         return identifier();
+    }
+    if (c == '"') {
+        return string();
     }
 
     switch (c) {

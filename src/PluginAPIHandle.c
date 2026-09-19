@@ -6,6 +6,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
+
+extern void runFile(const char *filename);
 
 // Helper to push a raw Node to the GC root stack and return its index
 static Handle makeHandle(Node *n) {
@@ -125,6 +128,49 @@ static void *api_getUserData(Handle n) { return getUserData(gcRoots[n]); }
 static int api_getTypeID(Handle n) { return getTypeID(gcRoots[n]); }
 static int api_getSubType(Handle n) { return getSubType(gcRoots[n]); }
 
+static void api_runFile(const char *filename) {
+    runFile(filename);
+}
+
+static int api_unpackArgs(Handle args, Handle env, const char *format, ...) {
+    va_list ap;
+    va_start(ap, format);
+    Handle curr = args;
+    
+    for (int i = 0; format[i] != '\0'; i++) {
+        if (curr < 0 || api_getNodeType(curr) != CONS) {
+            va_end(ap);
+            return 0; 
+        }
+        
+        Handle expr = api_getLeft(curr);
+        Handle val = api_evaluate(expr, env);
+        
+        if (format[i] == 'i') {
+            if (api_getNodeType(val) != LITERAL) {
+                va_end(ap);
+                return 0; 
+            }
+            int *out = va_arg(ap, int*);
+            *out = api_getLiteral(val);
+        } else if (format[i] == 's') {
+            if (api_getNodeType(val) != FOREIGN) {
+                va_end(ap);
+                return 0; 
+            }
+            char **out = va_arg(ap, char**);
+            *out = (char*)api_getUserData(val);
+        } else if (format[i] == 'h') {
+            Handle *out = va_arg(ap, Handle*);
+            *out = val;
+        }
+        
+        curr = api_getRight(curr);
+    }
+    va_end(ap);
+    return 1;
+}
+
 static char *typeRegistry[256];
 static int typeCount = 100;
 
@@ -160,6 +206,8 @@ VMAPI getHandleAPI(void) {
                  .setLeft = api_setLeft,
                  .setRight = api_setRight,
                  .getLiteral = api_getLiteral,
+                 .runFile = api_runFile,
+                 .unpackArgs = api_unpackArgs,
                  .getVarName = api_getVarName,
                  .getFuncName = api_getFuncName,
                  .createForeign = api_createForeign,

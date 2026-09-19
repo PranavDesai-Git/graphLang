@@ -113,6 +113,39 @@ void loadAllPlugins(const char *dirPath, VMAPI api) {
     closedir(dir);
 }
 
+void runFile(const char *filename) {
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL) {
+        printf("Error: Could not open file '%s'\n", filename);
+        return;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    rewind(file);
+
+    char *buffer = malloc(fileSize + 1);
+    if (buffer == NULL) {
+        printf("Error: Not enough memory to read file '%s'\n", filename);
+        fclose(file);
+        return;
+    }
+
+    size_t bytesRead = fread(buffer, 1, fileSize, file);
+    buffer[bytesRead] = '\0';
+    fclose(file);
+
+    int savedRootCount = rootCount;
+    if (setjmp(error_jmp) == 0) {
+        parse(buffer);
+    } else {
+        rootCount = savedRootCount;
+        printf("Caught parse error in file: %s\n", filename);
+    }
+    
+    free(buffer);
+}
+
 int main(int argc, char **argv) {
     VMAPI api = getHandleAPI();
 
@@ -128,36 +161,7 @@ int main(int argc, char **argv) {
     enableGC();
 
     if (argc > 1) {
-        FILE *file = fopen(argv[1], "rb");
-        if (file == NULL) {
-            printf("Error: Could not open file '%s'\n", argv[1]);
-            return 1;
-        }
-
-        fseek(file, 0, SEEK_END);
-        long fileSize = ftell(file);
-        rewind(file);
-
-        char *buffer = malloc(fileSize + 1);
-        if (buffer == NULL) {
-            printf("Error: Not enough memory to read file '%s'\n", argv[1]);
-            fclose(file);
-            return 1;
-        }
-
-        size_t bytesRead = fread(buffer, 1, fileSize, file);
-        buffer[bytesRead] = '\0';
-        fclose(file);
-
-        int savedRootCount = rootCount;
-        if (setjmp(error_jmp) == 0) {
-            parse(buffer);
-        } else {
-            rootCount = savedRootCount;
-            printf("Caught parse error in file: %s\n", argv[1]);
-        }
-        
-        free(buffer);
+        runFile(argv[1]);
         return 0;
     }
 

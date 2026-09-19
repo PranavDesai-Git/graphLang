@@ -6,6 +6,7 @@ typedef enum {
     TOKEN_RPAREN,
     TOKEN_IDENTIFIER,
     TOKEN_NUMBER,
+    TOKEN_STRING,
     TOKEN_EOF,
     TOKEN_ERROR
 } TokenType;
@@ -19,5 +20,8 @@ typedef struct {
 
 void initLexer(const char *source);
 Token scanToken(void);
+
+void pushLexerState(void);
+void popLexerState(void);
 
 #endif

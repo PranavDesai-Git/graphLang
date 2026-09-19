@@ -25,6 +25,8 @@ typedef struct {
     void (*setLeft)(Handle n, Handle left);
     void (*setRight)(Handle n, Handle right);
     int (*getLiteral)(Handle n);
+    void (*runFile)(const char *filename);
+    int (*unpackArgs)(Handle args, Handle env, const char *format, ...);
     char *(*getVarName)(Handle n);
     char *(*getFuncName)(Handle n);
 
